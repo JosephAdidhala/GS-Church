@@ -3,17 +3,127 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Church Project</title>
+    <title>Church Board Packet Dashboard</title>
     <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
+    <script src="app.js" defer></script>
   </head>
   <body>
-    <main class="container">
-      <h1>Church</h1>
-      <p>Your new project is ready.</p>
-      <button id="cta">Click me</button>
-      <p id="status"></p>
-    </main>
+    <header class="topbar">
+      <div>
+        <h1>Board Packet Finance Dashboard</h1>
+        <p class="subtitle">Interactive view of downloaded board packet PDFs</p>
+      </div>
+      <button id="refresh-btn" type="button">Refresh View</button>
+    </header>
 
-    <script src="app.js"></script>
+    <nav class="nav-tabs">
+      <button data-tab="overview" class="tab active">Overview</button>
+      <button data-tab="financial" class="tab">Financial Tracking</button>
+      <button data-tab="giving" class="tab">Giving & Donations</button>
+      <button data-tab="budget" class="tab">Budget vs Actual</button>
+      <button data-tab="packets" class="tab">All Packets</button>
+    </nav>
+
+    <main class="page">
+      <!-- Overview Tab -->
+      <section data-page="overview" class="tab-page active">
+        <section class="kpi-grid" id="kpi-grid">
+          <article class="card kpi"><h2>Total Packets</h2><p id="kpi-packets">-</p></article>
+          <article class="card kpi"><h2>Total Pages</h2><p id="kpi-pages">-</p></article>
+          <article class="card kpi"><h2>Currency Mentions</h2><p id="kpi-currency">-</p></article>
+          <article class="card kpi"><h2>Avg Pages / Packet</h2><p id="kpi-avg-pages">-</p></article>
+        </section>
+
+        <section class="grid-2">
+          <article class="card">
+            <h2>Finance Signal Trend</h2>
+            <canvas id="trend-chart"></canvas>
+          </article>
+          <article class="card">
+            <h2>Top Finance Keywords</h2>
+            <canvas id="keyword-chart"></canvas>
+          </article>
+        </section>
+
+        <section class="grid-2">
+          <article class="card">
+            <h2>Packet Size vs Money Mentions</h2>
+            <canvas id="scatter-chart"></canvas>
+          </article>
+          <article class="card details" id="packet-detail">
+            <h2>Packet Detail</h2>
+            <p>Select a row below to inspect a packet.</p>
+          </article>
+        </section>
+      </section>
+
+      <!-- Financial Tracking Tab -->
+      <section data-page="financial" class="tab-page">
+        <section class="kpi-grid">
+          <article class="card kpi"><h2>YTD Giving</h2><p id="kpi-giving">-</p></article>
+          <article class="card kpi"><h2>YTD Budget</h2><p id="kpi-budget">-</p></article>
+          <article class="card kpi"><h2>YTD Actual Spend</h2><p id="kpi-actual">-</p></article>
+          <article class="card kpi"><h2>Avg Variance %</h2><p id="kpi-variance">-</p></article>
+        </section>
+
+        <section class="grid-2">
+          <article class="card">
+            <h2>Budget vs Actual Trend</h2>
+            <canvas id="budget-trend-chart"></canvas>
+          </article>
+          <article class="card">
+            <h2>Top Expense Categories</h2>
+            <canvas id="expense-chart"></canvas>
+          </article>
+        </section>
+      </section>
+
+      <!-- Giving Tab -->
+      <section data-page="giving" class="tab-page">
+        <section class="kpi-grid">
+          <article class="card kpi"><h2>Total YTD Giving</h2><p id="kpi-total-giving">-</p></article>
+          <article class="card kpi"><h2>Avg Monthly Giving %</h2><p id="kpi-monthly-avg">-</p></article>
+        </section>
+
+        <article class="card">
+          <h2>Monthly Giving vs Budget %</h2>
+          <canvas id="giving-monthly-chart"></canvas>
+        </article>
+      </section>
+
+      <!-- Budget Tab -->
+      <section data-page="budget" class="tab-page">
+        <article class="card">
+          <h2>Budget Variance Analysis</h2>
+          <div id="budget-detail"></div>
+        </article>
+      </section>
+
+      <!-- All Packets Tab -->
+      <section data-page="packets" class="tab-page">
+        <article class="card">
+          <div class="table-header">
+            <h2>All Board Packets</h2>
+            <input id="filter-input" type="search" placeholder="Filter by title/date..." />
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Title</th>
+                  <th>Pages</th>
+                  <th>Currency Mentions</th>
+                  <th>Finance Score</th>
+                  <th>YTD Giving</th>
+                </tr>
+              </thead>
+              <tbody id="packet-table-body"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
   </body>
 </html>

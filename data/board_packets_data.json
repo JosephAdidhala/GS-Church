@@ -1,0 +1,889 @@
+{
+  "generated_at": "2026-05-14T00:12:17.374971Z",
+  "source_dir": "/Users/joey/Documents/GitHub/Workouts/church/downloads/board-packets",
+  "summary": {
+    "packet_count": 12,
+    "total_pages": 204,
+    "average_pages": 17.0,
+    "currency_mentions": 5084
+  },
+  "financial_summary": {
+    "total_giving_ytd": 30.0,
+    "total_budget_ytd": 2454814.0,
+    "total_actual_ytd": 2734619.0,
+    "average_variance_ytd": 279804.0
+  },
+  "finance_keyword_totals": {
+    "finance": 103,
+    "budget": 358,
+    "income": 92,
+    "expense": 65,
+    "expenses": 76,
+    "revenue": 55,
+    "cash": 103,
+    "balance": 56,
+    "giving": 21,
+    "offering": 26,
+    "donation": 9,
+    "loan": 14,
+    "mortgage": 28
+  },
+  "giving_monthly_averages": {
+    "November": 82.0,
+    "January": 222.0,
+    "YTD": 214.0,
+    "February": 90.0,
+    "March": 102.0
+  },
+  "top_expense_categories": {
+    "Building": 9301591.0,
+    "Missions": 763094.0,
+    "Facilities": 524454.0,
+    "Utilities": 197350.0
+  },
+  "trend": [
+    {
+      "meeting_date": "2025-02-24",
+      "sent_date": "2025-02-21",
+      "display_date": "2025-02-24",
+      "title": "GS Board Packet  Meeting Monday 24 2025 Pictures 7PM",
+      "finance_score": 621,
+      "currency_mentions": 544,
+      "page_count": 17,
+      "giving_ytd": 10.0,
+      "budget_ytd": null,
+      "actual_ytd": null,
+      "variance_ytd": null
+    },
+    {
+      "meeting_date": "2025-03-31",
+      "sent_date": "2025-03-28",
+      "display_date": "2025-03-31",
+      "title": "Board Packet - Meeting March 31st 7 00 PM",
+      "finance_score": 202,
+      "currency_mentions": 144,
+      "page_count": 13,
+      "giving_ytd": 10.0,
+      "budget_ytd": 2454814.0,
+      "actual_ytd": 2734619.0,
+      "variance_ytd": 279804.0
+    },
+    {
+      "meeting_date": "2025-04-20",
+      "sent_date": "2025-04-25",
+      "display_date": "2025-04-20",
+      "title": "Board Packet - Meeting Monday April 28th 7PM",
+      "finance_score": 36,
+      "currency_mentions": 16,
+      "page_count": 14,
+      "giving_ytd": 10.0,
+      "budget_ytd": null,
+      "actual_ytd": null,
+      "variance_ytd": null
+    },
+    {
+      "meeting_date": "2025-05-19",
+      "sent_date": "2025-05-16",
+      "display_date": "2025-05-19",
+      "title": "May 19th Board Meeting Packet",
+      "finance_score": 473,
+      "currency_mentions": 391,
+      "page_count": 14,
+      "giving_ytd": null,
+      "budget_ytd": null,
+      "actual_ytd": null,
+      "variance_ytd": null
+    },
+    {
+      "meeting_date": "2025-06-23",
+      "sent_date": "2025-06-20",
+      "display_date": "2025-06-23",
+      "title": "GS Board Meeting Agenda Monday 7PM",
+      "finance_score": 477,
+      "currency_mentions": 396,
+      "page_count": 15,
+      "giving_ytd": null,
+      "budget_ytd": null,
+      "actual_ytd": null,
+      "variance_ytd": null
+    },
+    {
+      "meeting_date": "2025-07-28",
+      "sent_date": "2025-07-25",
+      "display_date": "2025-07-28",
+      "title": "GS Board Meeting Packet - July 28 2025",
+      "finance_score": 707,
+      "currency_mentions": 595,
+      "page_count": 26,
+      "giving_ytd": null,
+      "budget_ytd": null,
+      "actual_ytd": null,
+      "variance_ytd": null
+    },
+    {
+      "meeting_date": "2025-08-25",
+      "sent_date": "2025-08-22",
+      "display_date": "2025-08-25",
+      "title": "Agenda for Board Meeting Monday",
+      "finance_score": 602,
+      "currency_mentions": 487,
+      "page_count": 20,
+      "giving_ytd": null,
+      "budget_ytd": null,
+      "actual_ytd": null,
+      "variance_ytd": null
+    },
+    {
+      "meeting_date": "2025-10-27",
+      "sent_date": "2025-10-24",
+      "display_date": "2025-10-27",
+      "title": "Good Shepherd Board Meeting Agenda - Monday Oct 27 7PM",
+      "finance_score": 558,
+      "currency_mentions": 477,
+      "page_count": 16,
+      "giving_ytd": null,
+      "budget_ytd": null,
+      "actual_ytd": null,
+      "variance_ytd": null
+    },
+    {
+      "meeting_date": "2025-12-08",
+      "sent_date": "2025-12-06",
+      "display_date": "2025-12-08",
+      "title": "Board Packet Information - Meeting December 8th 7PM",
+      "finance_score": 0,
+      "currency_mentions": 0,
+      "page_count": 18,
+      "giving_ytd": null,
+      "budget_ytd": null,
+      "actual_ytd": null,
+      "variance_ytd": null
+    },
+    {
+      "meeting_date": "2025-12-21",
+      "sent_date": "2026-02-06",
+      "display_date": "2025-12-21",
+      "title": "Important - Room Change and Reminder - GS Board and Training Meeting Monday Feb 9th 6 30 PM",
+      "finance_score": 946,
+      "currency_mentions": 785,
+      "page_count": 18,
+      "giving_ytd": null,
+      "budget_ytd": null,
+      "actual_ytd": null,
+      "variance_ytd": null
+    },
+    {
+      "meeting_date": "2026-01-26",
+      "sent_date": "2026-01-30",
+      "display_date": "2026-01-26",
+      "title": "Board Packet for Review - Board Meeting & Training - Monday Feb 2nd 2026 6 30",
+      "finance_score": 922,
+      "currency_mentions": 783,
+      "page_count": 18,
+      "giving_ytd": null,
+      "budget_ytd": null,
+      "actual_ytd": null,
+      "variance_ytd": null
+    },
+    {
+      "meeting_date": "2026-03-29",
+      "sent_date": "2026-03-27",
+      "display_date": "2026-03-29",
+      "title": "Board Meeting Agenda - Monday 30th 7PM",
+      "finance_score": 546,
+      "currency_mentions": 466,
+      "page_count": 15,
+      "giving_ytd": null,
+      "budget_ytd": null,
+      "actual_ytd": null,
+      "variance_ytd": null
+    }
+  ],
+  "packets": [
+    {
+      "file_name": "1740165653000__GS Board Packet_ Meeting Monday 24 2025 Pictures 7PM__---Board Packet 02.24.2025---.pdf",
+      "title": "GS Board Packet  Meeting Monday 24 2025 Pictures 7PM",
+      "meeting_date": "2025-02-24",
+      "sent_date": "2025-02-21",
+      "display_date": "2025-02-24",
+      "timestamp_ms": 1740165653000,
+      "page_count": 17,
+      "currency_mentions": 544,
+      "top_amounts": [
+        10857256.99,
+        10857256.99,
+        10784944.24,
+        10784944.24,
+        9194863.76
+      ],
+      "keyword_counts": {
+        "finance": 21,
+        "budget": 18,
+        "income": 7,
+        "expense": 2,
+        "expenses": 7,
+        "revenue": 6,
+        "cash": 5,
+        "balance": 5,
+        "giving": 3,
+        "offering": 0,
+        "donation": 0,
+        "loan": 2,
+        "mortgage": 1
+      },
+      "finance_score": 621,
+      "financial_data": {
+        "giving_monthly": {
+          "November": 82.0,
+          "January": 111.0,
+          "YTD": 108.0
+        },
+        "giving_ytd": 10.0,
+        "budget_ytd": null,
+        "actual_ytd": null,
+        "variance_ytd": null,
+        "top_expenses": [
+          [
+            "Building",
+            537052.0
+          ],
+          [
+            "Building",
+            537052.0
+          ],
+          [
+            "Building",
+            74549.0
+          ],
+          [
+            "Building",
+            74549.0
+          ],
+          [
+            "Facilities",
+            47157.0
+          ]
+        ]
+      }
+    },
+    {
+      "file_name": "1743174679000__Board Packet - Meeting March 31st 7_00 PM__---Board Packet 03.31.2025.pdf",
+      "title": "Board Packet - Meeting March 31st 7 00 PM",
+      "meeting_date": "2025-03-31",
+      "sent_date": "2025-03-28",
+      "display_date": "2025-03-31",
+      "timestamp_ms": 1743174679000,
+      "page_count": 13,
+      "currency_mentions": 144,
+      "top_amounts": [
+        5947745.0,
+        4813629.0,
+        4010134.0,
+        3846520.0,
+        3643299.0
+      ],
+      "keyword_counts": {
+        "finance": 2,
+        "budget": 25,
+        "income": 3,
+        "expense": 4,
+        "expenses": 3,
+        "revenue": 2,
+        "cash": 7,
+        "balance": 4,
+        "giving": 3,
+        "offering": 3,
+        "donation": 0,
+        "loan": 0,
+        "mortgage": 2
+      },
+      "finance_score": 202,
+      "financial_data": {
+        "giving_monthly": {
+          "January": 111.0,
+          "February": 90.0
+        },
+        "giving_ytd": 10.0,
+        "budget_ytd": 2454814.0,
+        "actual_ytd": 2734619.0,
+        "variance_ytd": 279804.0,
+        "top_expenses": []
+      }
+    },
+    {
+      "file_name": "1745618751000__Board Packet - Meeting Monday April 28th 7PM__Board Packet April 28 2025.pdf",
+      "title": "Board Packet - Meeting Monday April 28th 7PM",
+      "meeting_date": "2025-04-20",
+      "sent_date": "2025-04-25",
+      "display_date": "2025-04-20",
+      "timestamp_ms": 1745618751000,
+      "page_count": 14,
+      "currency_mentions": 16,
+      "top_amounts": [
+        3431816.0,
+        472367.0,
+        409136.0,
+        374440.0,
+        78589.0
+      ],
+      "keyword_counts": {
+        "finance": 8,
+        "budget": 8,
+        "income": 1,
+        "expense": 1,
+        "expenses": 0,
+        "revenue": 0,
+        "cash": 0,
+        "balance": 2,
+        "giving": 0,
+        "offering": 0,
+        "donation": 0,
+        "loan": 0,
+        "mortgage": 0
+      },
+      "finance_score": 36,
+      "financial_data": {
+        "giving_monthly": {
+          "March": 102.0,
+          "YTD": 106.0
+        },
+        "giving_ytd": 10.0,
+        "budget_ytd": null,
+        "actual_ytd": null,
+        "variance_ytd": null,
+        "top_expenses": []
+      }
+    },
+    {
+      "file_name": "1747411789000__May 19th Board Meeting Packet__---Board Packet 05.19.2025---.pdf",
+      "title": "May 19th Board Meeting Packet",
+      "meeting_date": "2025-05-19",
+      "sent_date": "2025-05-16",
+      "display_date": "2025-05-19",
+      "timestamp_ms": 1747411789000,
+      "page_count": 14,
+      "currency_mentions": 391,
+      "top_amounts": [
+        10918902.69,
+        10918902.69,
+        10898762.29,
+        10898762.29,
+        9194863.76
+      ],
+      "keyword_counts": {
+        "finance": 8,
+        "budget": 30,
+        "income": 7,
+        "expense": 6,
+        "expenses": 5,
+        "revenue": 4,
+        "cash": 9,
+        "balance": 4,
+        "giving": 2,
+        "offering": 1,
+        "donation": 2,
+        "loan": 1,
+        "mortgage": 3
+      },
+      "finance_score": 473,
+      "financial_data": {
+        "giving_monthly": {},
+        "giving_ytd": null,
+        "budget_ytd": null,
+        "actual_ytd": null,
+        "variance_ytd": null,
+        "top_expenses": [
+          [
+            "Building",
+            567052.0
+          ],
+          [
+            "Building",
+            167052.0
+          ],
+          [
+            "Building",
+            87259.0
+          ],
+          [
+            "Building",
+            87259.0
+          ],
+          [
+            "Facilities",
+            46473.0
+          ]
+        ]
+      }
+    },
+    {
+      "file_name": "1750448266000__GS Board Meeting Agenda Monday 7PM__---Board Packet 06.23.2025---.pdf",
+      "title": "GS Board Meeting Agenda Monday 7PM",
+      "meeting_date": "2025-06-23",
+      "sent_date": "2025-06-20",
+      "display_date": "2025-06-23",
+      "timestamp_ms": 1750448266000,
+      "page_count": 15,
+      "currency_mentions": 396,
+      "top_amounts": [
+        10898762.29,
+        10898762.29,
+        10866155.6,
+        10866155.6,
+        9194863.76
+      ],
+      "keyword_counts": {
+        "finance": 9,
+        "budget": 29,
+        "income": 7,
+        "expense": 5,
+        "expenses": 5,
+        "revenue": 4,
+        "cash": 9,
+        "balance": 4,
+        "giving": 1,
+        "offering": 1,
+        "donation": 3,
+        "loan": 1,
+        "mortgage": 3
+      },
+      "finance_score": 477,
+      "financial_data": {
+        "giving_monthly": {},
+        "giving_ytd": null,
+        "budget_ytd": null,
+        "actual_ytd": null,
+        "variance_ytd": null,
+        "top_expenses": [
+          [
+            "Building",
+            577052.0
+          ],
+          [
+            "Building",
+            177052.0
+          ],
+          [
+            "Missions",
+            90885.0
+          ],
+          [
+            "Building",
+            88909.0
+          ],
+          [
+            "Building",
+            88909.0
+          ]
+        ]
+      }
+    },
+    {
+      "file_name": "1753470323000__GS Board Meeting Packet - July 28 2025__---Board Packet 07.28.2025---.pdf",
+      "title": "GS Board Meeting Packet - July 28 2025",
+      "meeting_date": "2025-07-28",
+      "sent_date": "2025-07-25",
+      "display_date": "2025-07-28",
+      "timestamp_ms": 1753470323000,
+      "page_count": 26,
+      "currency_mentions": 595,
+      "top_amounts": [
+        10866155.6,
+        10866155.6,
+        9851616.19,
+        9851616.19,
+        9473247.47
+      ],
+      "keyword_counts": {
+        "finance": 12,
+        "budget": 40,
+        "income": 7,
+        "expense": 5,
+        "expenses": 16,
+        "revenue": 10,
+        "cash": 10,
+        "balance": 5,
+        "giving": 1,
+        "offering": 1,
+        "donation": 1,
+        "loan": 1,
+        "mortgage": 3
+      },
+      "finance_score": 707,
+      "financial_data": {
+        "giving_monthly": {},
+        "giving_ytd": null,
+        "budget_ytd": null,
+        "actual_ytd": null,
+        "variance_ytd": null,
+        "top_expenses": [
+          [
+            "Building",
+            587052.0
+          ],
+          [
+            "Missions",
+            548790.0
+          ],
+          [
+            "Facilities",
+            282863.0
+          ],
+          [
+            "Utilities",
+            197350.0
+          ],
+          [
+            "Building",
+            89729.0
+          ]
+        ]
+      }
+    },
+    {
+      "file_name": "1755883631000__Agenda for Board Meeting Monday__---Board Packet 08.25.2025.2---.pdf",
+      "title": "Agenda for Board Meeting Monday",
+      "meeting_date": "2025-08-25",
+      "sent_date": "2025-08-22",
+      "display_date": "2025-08-25",
+      "timestamp_ms": 1755883631000,
+      "page_count": 20,
+      "currency_mentions": 487,
+      "top_amounts": [
+        10756635.83,
+        10756635.83,
+        9851616.19,
+        9851616.19,
+        9473247.47
+      ],
+      "keyword_counts": {
+        "finance": 13,
+        "budget": 48,
+        "income": 6,
+        "expense": 6,
+        "expenses": 6,
+        "revenue": 7,
+        "cash": 9,
+        "balance": 8,
+        "giving": 3,
+        "offering": 2,
+        "donation": 0,
+        "loan": 3,
+        "mortgage": 4
+      },
+      "finance_score": 602,
+      "financial_data": {
+        "giving_monthly": {},
+        "giving_ytd": null,
+        "budget_ytd": null,
+        "actual_ytd": null,
+        "variance_ytd": null,
+        "top_expenses": [
+          [
+            "Building",
+            597052.0
+          ],
+          [
+            "Building",
+            90239.0
+          ],
+          [
+            "Building",
+            90239.0
+          ],
+          [
+            "Facilities",
+            53747.0
+          ],
+          [
+            "Missions",
+            35461.0
+          ]
+        ]
+      }
+    },
+    {
+      "file_name": "1761334831000__Good Shepherd Board Meeting Agenda - Monday Oct 27 7PM__---Board Packet 10.27.2025---.pdf",
+      "title": "Good Shepherd Board Meeting Agenda - Monday Oct 27 7PM",
+      "meeting_date": "2025-10-27",
+      "sent_date": "2025-10-24",
+      "display_date": "2025-10-27",
+      "timestamp_ms": 1761334831000,
+      "page_count": 16,
+      "currency_mentions": 477,
+      "top_amounts": [
+        11355429.89,
+        11355429.89,
+        10810711.55,
+        10810711.55,
+        9473247.47
+      ],
+      "keyword_counts": {
+        "finance": 6,
+        "budget": 30,
+        "income": 8,
+        "expense": 5,
+        "expenses": 6,
+        "revenue": 4,
+        "cash": 9,
+        "balance": 4,
+        "giving": 1,
+        "offering": 4,
+        "donation": 1,
+        "loan": 1,
+        "mortgage": 2
+      },
+      "finance_score": 558,
+      "financial_data": {
+        "giving_monthly": {},
+        "giving_ytd": null,
+        "budget_ytd": null,
+        "actual_ytd": null,
+        "variance_ytd": null,
+        "top_expenses": [
+          [
+            "Building",
+            617052.0
+          ],
+          [
+            "Building",
+            91359.0
+          ],
+          [
+            "Building",
+            91359.0
+          ],
+          [
+            "Facilities",
+            48777.0
+          ],
+          [
+            "Missions",
+            42736.0
+          ]
+        ]
+      }
+    },
+    {
+      "file_name": "1765040983000__Board Packet Information - Meeting December 8th 7PM__---Board EMAIL Packet 12.08.2025---Sm.pdf",
+      "title": "Board Packet Information - Meeting December 8th 7PM",
+      "meeting_date": "2025-12-08",
+      "sent_date": "2025-12-06",
+      "display_date": "2025-12-08",
+      "timestamp_ms": 1765040983000,
+      "page_count": 18,
+      "currency_mentions": 0,
+      "top_amounts": [],
+      "keyword_counts": {
+        "finance": 0,
+        "budget": 0,
+        "income": 0,
+        "expense": 0,
+        "expenses": 0,
+        "revenue": 0,
+        "cash": 0,
+        "balance": 0,
+        "giving": 0,
+        "offering": 0,
+        "donation": 0,
+        "loan": 0,
+        "mortgage": 0
+      },
+      "finance_score": 0,
+      "financial_data": {
+        "giving_monthly": {},
+        "giving_ytd": null,
+        "budget_ytd": null,
+        "actual_ytd": null,
+        "variance_ytd": null,
+        "top_expenses": []
+      }
+    },
+    {
+      "file_name": "1770404188000__Important - Room Change and Reminder - GS Board and Training Meeting Monday Feb 9th 6_30 PM__Board Packet Expanded 02062026.pdf",
+      "title": "Important - Room Change and Reminder - GS Board and Training Meeting Monday Feb 9th 6 30 PM",
+      "meeting_date": "2025-12-21",
+      "sent_date": "2026-02-06",
+      "display_date": "2025-12-21",
+      "timestamp_ms": 1770404188000,
+      "page_count": 18,
+      "currency_mentions": 785,
+      "top_amounts": [
+        11123061.57,
+        11123061.57,
+        10884929.45,
+        10884929.45,
+        10870764.82
+      ],
+      "keyword_counts": {
+        "finance": 9,
+        "budget": 50,
+        "income": 26,
+        "expense": 16,
+        "expenses": 11,
+        "revenue": 7,
+        "cash": 18,
+        "balance": 8,
+        "giving": 3,
+        "offering": 6,
+        "donation": 1,
+        "loan": 2,
+        "mortgage": 4
+      },
+      "finance_score": 946,
+      "financial_data": {
+        "giving_monthly": {},
+        "giving_ytd": null,
+        "budget_ytd": null,
+        "actual_ytd": null,
+        "variance_ytd": null,
+        "top_expenses": [
+          [
+            "Building",
+            647052.0
+          ],
+          [
+            "Building",
+            637052.0
+          ],
+          [
+            "Building",
+            93514.0
+          ],
+          [
+            "Building",
+            93514.0
+          ],
+          [
+            "Building",
+            92084.0
+          ]
+        ]
+      }
+    },
+    {
+      "file_name": "1769789771000__Board Packet for Review - Board Meeting & Training - Monday Feb 2nd 2026 6_30__Board Packet Expanded 01.26.2026.pdf",
+      "title": "Board Packet for Review - Board Meeting & Training - Monday Feb 2nd 2026 6 30",
+      "meeting_date": "2026-01-26",
+      "sent_date": "2026-01-30",
+      "display_date": "2026-01-26",
+      "timestamp_ms": 1769789771000,
+      "page_count": 18,
+      "currency_mentions": 783,
+      "top_amounts": [
+        11123061.57,
+        11123061.57,
+        10884929.45,
+        10884929.45,
+        10870764.82
+      ],
+      "keyword_counts": {
+        "finance": 8,
+        "budget": 47,
+        "income": 14,
+        "expense": 10,
+        "expenses": 11,
+        "revenue": 7,
+        "cash": 18,
+        "balance": 8,
+        "giving": 3,
+        "offering": 6,
+        "donation": 1,
+        "loan": 2,
+        "mortgage": 4
+      },
+      "finance_score": 922,
+      "financial_data": {
+        "giving_monthly": {},
+        "giving_ytd": null,
+        "budget_ytd": null,
+        "actual_ytd": null,
+        "variance_ytd": null,
+        "top_expenses": [
+          [
+            "Building",
+            647052.0
+          ],
+          [
+            "Building",
+            637052.0
+          ],
+          [
+            "Building",
+            93514.0
+          ],
+          [
+            "Building",
+            93514.0
+          ],
+          [
+            "Building",
+            92084.0
+          ]
+        ]
+      }
+    },
+    {
+      "file_name": "1774636851000__Board Meeting Agenda - Monday 30th 7PM__Board Packet - March 30, 2026.pdf",
+      "title": "Board Meeting Agenda - Monday 30th 7PM",
+      "meeting_date": "2026-03-29",
+      "sent_date": "2026-03-27",
+      "display_date": "2026-03-29",
+      "timestamp_ms": 1774636851000,
+      "page_count": 15,
+      "currency_mentions": 466,
+      "top_amounts": [
+        11218909.83,
+        11218909.83,
+        11059202.36,
+        11059202.36,
+        9473247.47
+      ],
+      "keyword_counts": {
+        "finance": 7,
+        "budget": 33,
+        "income": 6,
+        "expense": 5,
+        "expenses": 6,
+        "revenue": 4,
+        "cash": 9,
+        "balance": 4,
+        "giving": 1,
+        "offering": 2,
+        "donation": 0,
+        "loan": 1,
+        "mortgage": 2
+      },
+      "finance_score": 546,
+      "financial_data": {
+        "giving_monthly": {},
+        "giving_ytd": null,
+        "budget_ytd": null,
+        "actual_ytd": null,
+        "variance_ytd": null,
+        "top_expenses": [
+          [
+            "Building",
+            667052.0
+          ],
+          [
+            "Building",
+            95140.0
+          ],
+          [
+            "Building",
+            95140.0
+          ],
+          [
+            "Facilities",
+            45437.0
+          ],
+          [
+            "Missions",
+            45222.0
+          ]
+        ]
+      }
+    }
+  ]
+}
