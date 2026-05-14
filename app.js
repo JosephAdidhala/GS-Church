@@ -82,12 +82,14 @@ function parseCsv(text) {
 function bindCsvUpload() {
     const input = byId('metricsCsvInput');
     if (!input) return;
+    const status = byId('uploadStatus');
+    if (status) status.textContent = 'Using board packet trends now (CSV optional).';
     input.addEventListener('change', async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
         const text = await file.text();
         csvRows = parseCsv(text);
-        byId('uploadStatus').textContent = csvRows.length ? `Loaded ${csvRows.length} monthly rows from ${file.name}` : 'CSV loaded but no usable rows found.';
+        byId('uploadStatus').textContent = csvRows.length ? `Loaded ${csvRows.length} monthly rows from ${file.name}` : 'CSV selected, but no usable rows found. Using board packet trends.';
         rerender();
     });
 }
@@ -236,16 +238,6 @@ function renderTrendTable(data) {
     }
 }
 
-function renderRawData(data) {
-    const el = byId('rawDataBlock');
-    if (!el) return;
-    try {
-        el.textContent = JSON.stringify(data, null, 2);
-    } catch {
-        el.textContent = 'Unable to display raw data.';
-    }
-}
-
 function renderCharts(data) {
     if (typeof Chart === 'undefined') return;
 
@@ -371,6 +363,8 @@ async function initDashboard() {
         const res = await fetch('data/board_packets_data.json');
         if (!res.ok) throw new Error(`Failed to load JSON (${res.status})`);
         baseData = await res.json();
+        const status = byId('uploadStatus');
+        if (status) status.textContent = 'Using board packet trends now (CSV optional).';
         rerender();
     } catch (err) {
         console.error(err);
