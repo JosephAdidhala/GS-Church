@@ -365,6 +365,8 @@ function rerender() {
 
 async function initDashboard() {
     try {
+        const trendSummary = byId('trendSummary');
+        if (trendSummary) trendSummary.textContent = 'Loading trend data…';
         bindCsvUpload();
         const res = await fetch('data/board_packets_data.json');
         if (!res.ok) throw new Error(`Failed to load JSON (${res.status})`);
@@ -373,6 +375,12 @@ async function initDashboard() {
     } catch (err) {
         console.error(err);
         byId('footerNote').textContent = `Load error: ${err.message}`;
+        const trendSummary = byId('trendSummary');
+        if (trendSummary) trendSummary.textContent = `Unable to load trend data: ${err.message}`;
+        const trendBody = byId('trendTableBody');
+        if (trendBody) {
+            trendBody.innerHTML = '<tr><td colspan="6">Trend data unavailable. Refresh the page and try again.</td></tr>';
+        }
     }
 }
 
