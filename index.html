@@ -1,169 +1,481 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Church Board Packet Dashboard</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
-    <script src="app.js" defer></script>
-  </head>
-  <body>
-    <header class="topbar">
-      <div>
-        <h1>Board Packet Finance Dashboard</h1>
-        <p class="subtitle">Interactive view of downloaded board packet PDFs</p>
-      </div>
-      <button id="refresh-btn" type="button">Refresh View</button>
-    </header>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Shepherd Church - Financial Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>Good Shepherd Church</h1>
+                <p class="subtitle">Financial Dashboard & Board Reports</p>
+            </div>
+            <div class="header-meta">
+                <span class="data-status">Data updated: <span id="dataDate">—</span></span>
+            </div>
+        </header>
 
-    <nav class="nav-tabs">
-      <button data-tab="overview" class="tab active">Overview</button>
-      <button data-tab="financial" class="tab">Financial Tracking</button>
-      <button data-tab="giving" class="tab">Giving & Donations</button>
-      <button data-tab="budget" class="tab">Budget vs Actual</button>
-      <button data-tab="packets" class="tab">All Packets</button>
-    </nav>
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="overview">Overview</button>
+            <button class="tab-btn" data-tab="weekly-offerings">Weekly Offerings</button>
+            <button class="tab-btn" data-tab="balance-sheet">Balance Sheet</button>
+            <button class="tab-btn" data-tab="budget-vs-actual">Budget vs Actual</button>
+            <button class="tab-btn" data-tab="budget-detail">Budget Detail</button>
+            <button class="tab-btn" data-tab="financial">Financial Tracking</button>
+            <button class="tab-btn" data-tab="giving">Giving & Donations</button>
+            <button class="tab-btn" data-tab="packets">All Packets</button>
+        </nav>
 
-    <main class="page">
-      <!-- Overview Tab -->
-      <section data-page="overview" class="tab-page active">
-        <section class="kpi-grid" id="kpi-grid">
-          <article class="card kpi"><h2>Total Packets</h2><p id="kpi-packets">-</p></article>
-          <article class="card kpi"><h2>Total Pages</h2><p id="kpi-pages">-</p></article>
-          <article class="card kpi"><h2>Currency Mentions</h2><p id="kpi-currency">-</p></article>
-          <article class="card kpi"><h2>Avg Pages / Packet</h2><p id="kpi-avg-pages">-</p></article>
-        </section>
+        <!-- Content Area -->
+        <main class="content">
+            <!-- Overview Tab -->
+            <section id="overview" class="tab-content active">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">YTD Giving</div>
+                        <div class="kpi-value" id="kpi-giving">$0</div>
+                        <div class="kpi-meta">Year-to-Date</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">YTD Budget</div>
+                        <div class="kpi-value" id="kpi-budget">$0</div>
+                        <div class="kpi-meta">Year-to-Date</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">YTD Actual</div>
+                        <div class="kpi-value" id="kpi-actual">$0</div>
+                        <div class="kpi-meta">Year-to-Date</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Budget Variance</div>
+                        <div class="kpi-value" id="kpi-variance">$0</div>
+                        <div class="kpi-meta">Difference</div>
+                    </div>
+                </div>
 
-        <section class="grid-2">
-          <article class="card">
-            <h2>Finance Signal Trend</h2>
-            <div class="chart-container"><canvas id="trend-chart"></canvas></div>
-          </article>
-          <article class="card">
-            <h2>Top Finance Keywords</h2>
-            <div class="chart-container"><canvas id="keyword-chart"></canvas></div>
-          </article>
-        </section>
+                <div class="grid-2">
+                    <div class="chart-container">
+                        <h3>Giving Trend</h3>
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Top Expenses</h3>
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                </div>
 
-        <article class="card full-width">
-          <h2>Packet Analysis</h2>
-          <div class="chart-container"><canvas id="scatter-chart"></canvas></div>
-        </article>
-      </section>
+                <div class="grid-2">
+                    <div class="chart-container">
+                        <h3>Monthly Giving %</h3>
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Budget Breakdown</h3>
+                        <canvas id="budgetPieChart"></canvas>
+                    </div>
+                </div>
 
-      <!-- Financial Tracking Tab -->
-      <section data-page="financial" class="tab-page">
-        <section class="kpi-grid">
-          <article class="card kpi"><h2>YTD Giving</h2><p id="kpi-giving">-</p></article>
-          <article class="card kpi"><h2>YTD Budget</h2><p id="kpi-budget">-</p></article>
-          <article class="card kpi"><h2>YTD Actual Spend</h2><p id="kpi-actual">-</p></article>
-          <article class="card kpi"><h2>Variance</h2><p id="kpi-variance">-</p></article>
-        </section>
+                <div class="full-width">
+                    <div class="card">
+                        <h3>Recent Board Packets</h3>
+                        <table id="recentPacketsTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Title</th>
+                                    <th>Pages</th>
+                                    <th>Finance Items</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
-        <article class="card full-width">
-          <h2>Financial Summary Report</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr style="border-bottom: 2px solid var(--line);">
-              <th style="text-align: left; padding: 0.8rem;">Metric</th>
-              <th style="text-align: right; padding: 0.8rem;">Amount</th>
-              <th style="text-align: right; padding: 0.8rem;">Status</th>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--line);">
-              <td style="padding: 0.8rem;"><strong>YTD Giving</strong></td>
-              <td style="text-align: right; padding: 0.8rem;" id="report-giving">-</td>
-              <td style="text-align: right; padding: 0.8rem; color: #10b981;">✓</td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--line);">
-              <td style="padding: 0.8rem;"><strong>YTD Budget</strong></td>
-              <td style="text-align: right; padding: 0.8rem;" id="report-budget">-</td>
-              <td style="text-align: right; padding: 0.8rem;">—</td>
-            </tr>
-            <tr style="border-bottom: 1px solid var(--line);">
-              <td style="padding: 0.8rem;"><strong>YTD Actual Spend</strong></td>
-              <td style="text-align: right; padding: 0.8rem;" id="report-actual">-</td>
-              <td style="text-align: right; padding: 0.8rem;">—</td>
-            </tr>
-            <tr style="background: #f0f4f8; border-bottom: 2px solid var(--line);">
-              <td style="padding: 0.8rem;"><strong>Budget Variance</strong></td>
-              <td style="text-align: right; padding: 0.8rem; font-weight: bold;" id="report-variance">-</td>
-              <td style="text-align: right; padding: 0.8rem;" id="report-variance-status">—</td>
-            </tr>
-          </table>
-        </article>
+            <!-- Weekly Offerings Tab -->
+            <section id="weekly-offerings" class="tab-content">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Weekly Offering</div>
+                        <div class="kpi-value" id="kpi-avg-weekly">$0</div>
+                        <div class="kpi-meta">This Period</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Weekly Budget</div>
+                        <div class="kpi-value" id="kpi-weekly-budget">$0</div>
+                        <div class="kpi-meta">Target</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Weeks On Target</div>
+                        <div class="kpi-value" id="kpi-weeks-target">0</div>
+                        <div class="kpi-meta">Count</div>
+                    </div>
+                </div>
 
-        <section class="grid-2">
-          <article class="card">
-            <h2>Budget vs Actual Trend</h2>
-            <div class="chart-container"><canvas id="budget-trend-chart"></canvas></div>
-          </article>
-          <article class="card">
-            <h2>Top Expense Categories</h2>
-            <div class="chart-container"><canvas id="expense-chart"></canvas></div>
-          </article>
-        </section>
-      </section>
+                <div class="grid-2">
+                    <div class="chart-container">
+                        <h3>Weekly Offering Trend</h3>
+                        <canvas id="weeklyOfferingChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Weekly vs Budget</h3>
+                        <canvas id="weeklyBudgetChart"></canvas>
+                    </div>
+                </div>
 
-      <!-- Giving Tab -->
-      <section data-page="giving" class="tab-page">
-        <section class="kpi-grid">
-          <article class="card kpi"><h2>Total YTD Giving</h2><p id="kpi-total-giving">-</p></article>
-          <article class="card kpi"><h2>Avg Monthly Giving %</h2><p id="kpi-monthly-avg">-</p></article>
-          <article class="card kpi"><h2>Giving Performance</h2><p id="kpi-giving-perf">-</p></article>
-        </section>
+                <div class="full-width">
+                    <div class="card">
+                        <h3>Weekly Offerings Report</h3>
+                        <table id="weeklyOfferingsTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Week</th>
+                                    <th>Offering Amount</th>
+                                    <th>Budget</th>
+                                    <th>% of Budget</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
-        <article class="card full-width">
-          <h2>Monthly Giving Performance Report</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr style="border-bottom: 2px solid var(--line);">
-              <th style="text-align: left; padding: 0.8rem;">Month</th>
-              <th style="text-align: right; padding: 0.8rem;">% of Budget</th>
-              <th style="text-align: center; padding: 0.8rem;">Status</th>
-            </tr>
-            <tbody id="giving-report-table">
-              <tr style="border-bottom: 1px solid var(--line);"><td colspan="3" style="padding: 0.8rem; text-align: center; color: var(--muted);">Loading...</td></tr>
-            </tbody>
-          </table>
-        </article>
+            <!-- Balance Sheet Tab -->
+            <section id="balance-sheet" class="tab-content">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Assets</div>
+                        <div class="kpi-value" id="kpi-assets">$0</div>
+                        <div class="kpi-meta">Organization</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Liabilities</div>
+                        <div class="kpi-value" id="kpi-liabilities">$0</div>
+                        <div class="kpi-meta">Obligations</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Equity</div>
+                        <div class="kpi-value" id="kpi-equity">$0</div>
+                        <div class="kpi-meta">Net Worth</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Long-Term Debt</div>
+                        <div class="kpi-value" id="kpi-debt">$0</div>
+                        <div class="kpi-meta">Mortgage & Loans</div>
+                    </div>
+                </div>
 
-        <article class="card full-width">
-          <h2>Monthly Giving vs Budget %</h2>
-          <div class="chart-container"><canvas id="giving-monthly-chart"></canvas></div>
-        </article>
-      </section>
+                <div class="grid-2">
+                    <div class="chart-container">
+                        <h3>Assets Breakdown</h3>
+                        <canvas id="assetsChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Liabilities Breakdown</h3>
+                        <canvas id="liabilitiesChart"></canvas>
+                    </div>
+                </div>
 
-      <!-- Budget Tab -->
-      <section data-page="budget" class="tab-page">
-        <article class="card">
-          <h2>Budget Variance Analysis</h2>
-          <div id="budget-detail"></div>
-        </article>
-      </section>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Assets Summary</h3>
+                        <table id="assetsTable" class="summary-table">
+                            <tr>
+                                <td>Current Assets</td>
+                                <td class="amount" id="bs-current-assets">$0</td>
+                            </tr>
+                            <tr>
+                                <td>Fixed Assets</td>
+                                <td class="amount" id="bs-fixed-assets">$0</td>
+                            </tr>
+                            <tr class="total">
+                                <td>Total Assets</td>
+                                <td class="amount" id="bs-total-assets">$0</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <h3>Equity Summary</h3>
+                        <table id="equityTable" class="summary-table">
+                            <tr>
+                                <td>Unrestricted Funds</td>
+                                <td class="amount" id="bs-unrestricted">$0</td>
+                            </tr>
+                            <tr>
+                                <td>Restricted Funds</td>
+                                <td class="amount" id="bs-restricted">$0</td>
+                            </tr>
+                            <tr class="total">
+                                <td>Total Equity</td>
+                                <td class="amount" id="bs-total-equity">$0</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
 
-      <!-- All Packets Tab -->
-      <section data-page="packets" class="tab-page">
-        <article class="card">
-          <div class="table-header">
-            <h2>All Board Packets</h2>
-            <input id="filter-input" type="search" placeholder="Filter by title/date..." />
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Title</th>
-                  <th>Pages</th>
-                  <th>Currency Mentions</th>
-                  <th>Finance Score</th>
-                  <th>YTD Giving</th>
-                </tr>
-              </thead>
-              <tbody id="packet-table-body"></tbody>
-            </table>
-          </div>
-        </article>
-      </section>
-    </main>
-  </body>
+                <div class="full-width">
+                    <div class="card">
+                        <h3>Balance Sheet Details</h3>
+                        <table id="balanceSheetTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>% of Total</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Budget vs Actual Tab -->
+            <section id="budget-vs-actual" class="tab-content">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">YTD Budget</div>
+                        <div class="kpi-value" id="bva-budget">$0</div>
+                        <div class="kpi-meta">Total Budget</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">YTD Actual</div>
+                        <div class="kpi-value" id="bva-actual">$0</div>
+                        <div class="kpi-meta">Total Spent</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">YTD Variance</div>
+                        <div class="kpi-value" id="bva-variance">$0</div>
+                        <div class="kpi-meta">Difference</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">% Spent</div>
+                        <div class="kpi-value" id="bva-spent">0%</div>
+                        <div class="kpi-meta">of Budget</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="chart-container">
+                        <h3>Budget vs Actual Trend</h3>
+                        <canvas id="budgetTrendChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Budget Utilization</h3>
+                        <canvas id="budgetUtilChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="full-width">
+                    <div class="card">
+                        <h3>Budget vs Actual Summary</h3>
+                        <table id="budgetSummaryTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Budget</th>
+                                    <th>Actual</th>
+                                    <th>Variance</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Budget Detail Tab -->
+            <section id="budget-detail" class="tab-content">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Budget</div>
+                        <div class="kpi-value" id="bd-total-budget">$0</div>
+                        <div class="kpi-meta">Full Year</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Actual</div>
+                        <div class="kpi-value" id="bd-total-actual">$0</div>
+                        <div class="kpi-meta">YTD Spend</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Remaining Budget</div>
+                        <div class="kpi-value" id="bd-remaining">$0</div>
+                        <div class="kpi-meta">Available</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Monthly Spend</div>
+                        <div class="kpi-value" id="bd-monthly-avg">$0</div>
+                        <div class="kpi-meta">Monthly</div>
+                    </div>
+                </div>
+
+                <div class="chart-container" style="width: 100%; margin-bottom: 2rem;">
+                    <h3>Budget Line Items</h3>
+                    <canvas id="lineItemChart"></canvas>
+                </div>
+
+                <div class="full-width">
+                    <div class="card">
+                        <h3>Budget Detail Report</h3>
+                        <table id="budgetDetailTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Line Item</th>
+                                    <th>Budget</th>
+                                    <th>Actual</th>
+                                    <th>Variance</th>
+                                    <th>% Used</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Financial Tracking Tab -->
+            <section id="financial" class="tab-content">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">YTD Giving</div>
+                        <div class="kpi-value" id="ft-giving">$0</div>
+                        <div class="kpi-meta">Total Donations</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">YTD Budget</div>
+                        <div class="kpi-value" id="ft-budget">$0</div>
+                        <div class="kpi-meta">Budgeted Amount</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">YTD Actual</div>
+                        <div class="kpi-value" id="ft-actual">$0</div>
+                        <div class="kpi-meta">Actual Spending</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Variance</div>
+                        <div class="kpi-value" id="ft-variance">$0</div>
+                        <div class="kpi-meta">Per Packet</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="chart-container">
+                        <h3>Keyword Frequency</h3>
+                        <canvas id="keywordChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Finance Score Distribution</h3>
+                        <canvas id="scatterChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="full-width">
+                    <div class="card">
+                        <h3>Financial Summary Report</h3>
+                        <table id="financialSummaryTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="financialSummaryBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Giving & Donations Tab -->
+            <section id="giving" class="tab-content">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total YTD Giving</div>
+                        <div class="kpi-value" id="gd-ytd">$0</div>
+                        <div class="kpi-meta">Cumulative</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Avg Monthly Gift</div>
+                        <div class="kpi-value" id="gd-monthly">$0</div>
+                        <div class="kpi-meta">Average</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Giving % of Budget</div>
+                        <div class="kpi-value" id="gd-pct">0%</div>
+                        <div class="kpi-meta">Goal Achievement</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="chart-container">
+                        <h3>Monthly Giving Trend</h3>
+                        <canvas id="givingTrendChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Giving by Month</h3>
+                        <canvas id="givingBarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="full-width">
+                    <div class="card">
+                        <h3>Monthly Giving Performance</h3>
+                        <table id="givingReportTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>% of Budget</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="givingReportBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- All Packets Tab -->
+            <section id="packets" class="tab-content">
+                <div class="card">
+                    <h3>Board Packet Repository</h3>
+                    <div class="search-box">
+                        <input type="text" id="packetFilter" placeholder="Search packets by title or date...">
+                    </div>
+                    <table id="packetsTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Title</th>
+                                <th>Pages</th>
+                                <th>Finance Items</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Good Shepherd Church Board Packet Financial Dashboard</p>
+            <p class="footer-meta">Data source: Board packet PDFs • Updated automatically when new packets are analyzed</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
 </html>

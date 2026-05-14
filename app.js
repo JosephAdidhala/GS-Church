@@ -1,457 +1,801 @@
-const state = {
-  data: null,
-  filteredPackets: [],
-  activeFileName: null,
-  activeTab: 'overview',
-  charts: {}
-};
+// Church Financial Dashboard - App.js
 
-const el = {
-  kpiPackets: document.getElementById('kpi-packets'),
-  kpiPages: document.getElementById('kpi-pages'),
-  kpiCurrency: document.getElementById('kpi-currency'),
-  kpiAvgPages: document.getElementById('kpi-avg-pages'),
-  kpiGiving: document.getElementById('kpi-giving'),
-  kpiBudget: document.getElementById('kpi-budget'),
-  kpiActual: document.getElementById('kpi-actual'),
-  kpiVariance: document.getElementById('kpi-variance'),
-  kpiTotalGiving: document.getElementById('kpi-total-giving'),
-  kpiMonthlyAvg: document.getElementById('kpi-monthly-avg'),
-  kpiGivingPerf: document.getElementById('kpi-giving-perf'),
-  reportGiving: document.getElementById('report-giving'),
-  reportBudget: document.getElementById('report-budget'),
-  reportActual: document.getElementById('report-actual'),
-  reportVariance: document.getElementById('report-variance'),
-  reportVarianceStatus: document.getElementById('report-variance-status'),
-  givingReportTable: document.getElementById('giving-report-table'),
-  tableBody: document.getElementById('packet-table-body'),
-  budgetDetail: document.getElementById('budget-detail'),
-  filterInput: document.getElementById('filter-input'),
-  refreshBtn: document.getElementById('refresh-btn'),
-  tabs: document.querySelectorAll('.tab'),
-  tabPages: document.querySelectorAll('.tab-page')
-};
-
-const numberFmt = new Intl.NumberFormat('en-US');
-const moneyFmt = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 0
+const FORMAT = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
 });
 
-function formatDate(value) {
-  if (!value) return '-';
-  const d = new Date(`${value}T00:00:00`);
-  return Number.isNaN(d.valueOf()) ? value : d.toLocaleDateString();
-}
+const FORMAT_DECIMAL = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+});
 
-function setKpis(summary, financial) {
-  el.kpiPackets.textContent = numberFmt.format(summary.packet_count || 0);
-  el.kpiPages.textContent = numberFmt.format(summary.total_pages || 0);
-  el.kpiCurrency.textContent = numberFmt.format(summary.currency_mentions || 0);
-  el.kpiAvgPages.textContent = numberFmt.format(summary.average_pages || 0);
+let dashboardData = null;
+let charts = {};
 
-  el.kpiGiving.textContent = moneyFmt.format(financial.total_giving_ytd || 0);
-  el.kpiBudget.textContent = moneyFmt.format(financial.total_budget_ytd || 0);
-  el.kpiActual.textContent = moneyFmt.format(financial.total_actual_ytd || 0);
-  el.kpiVariance.textContent = numberFmt.format(Math.abs(financial.average_variance_ytd || 0)) + '%';
-  el.kpiTotalGiving.textContent = moneyFmt.format(financial.total_giving_ytd || 0);
-  
-  const monthCount = Object.keys(financial.giving_monthly_averages || {}).length;
-  const avgMonthly = monthCount > 0 
-    ? Object.values(financial.giving_monthly_averages || {}).reduce((a, b) => a + b, 0) / monthCount 
-    : 0;
-  el.kpiMonthlyAvg.textContent = numberFmt.format(Math.round(avgMonthly)) + '%';
-  
-  const givingPerf = financial.total_giving_ytd >= financial.total_budget_ytd ? 'Above' : 'Below';
-  el.kpiGivingPerf.textContent = givingPerf + ' Budget';
-
-  // Report table
-  el.reportGiving.textContent = moneyFmt.format(financial.total_giving_ytd || 0);
-  el.reportBudget.textContent = moneyFmt.format(financial.total_budget_ytd || 0);
-  el.reportActual.textContent = moneyFmt.format(financial.total_actual_ytd || 0);
-  
-  const variance = (financial.total_actual_ytd || 0) - (financial.total_budget_ytd || 0);
-  const varColor = variance > 0 ? '#ef4444' : '#10b981';
-  const varStatus = variance > 0 ? 'Over' : 'Under';
-  el.reportVariance.textContent = moneyFmt.format(Math.abs(variance));
-  el.reportVariance.style.color = varColor;
-  el.reportVarianceStatus.textContent = varStatus;
-  el.reportVarianceStatus.style.color = varColor;
-}
-
-function destroyCharts() {
-  Object.values(state.charts).forEach((chart) => chart?.destroy());
-  state.charts = {};
-}
-
-function createTrendChart(trend) {
-  const ctx = document.getElementById('trend-chart');
-  if (!ctx) return;
-
-  state.charts.trend = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: trend.map((t) => formatDate(t.display_date || t.meeting_date || t.sent_date)),
-      datasets: [
-        {
-          label: 'Finance Score',
-          data: trend.map((t) => t.finance_score),
-          borderColor: '#2563eb',
-          backgroundColor: 'rgba(37,99,235,0.2)',
-          tension: 0.25,
-          fill: true
-        },
-        {
-          label: 'Currency Mentions',
-          data: trend.map((t) => t.currency_mentions),
-          borderColor: '#0f766e',
-          backgroundColor: 'rgba(15,118,110,0.12)',
-          tension: 0.25
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom' } }
-    }
-  });
-}
-
-function createKeywordChart(keywordTotals) {
-  const ctx = document.getElementById('keyword-chart');
-  if (!ctx) return;
-
-  const entries = Object.entries(keywordTotals || {})
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8);
-
-  state.charts.keyword = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: entries.map((entry) => entry[0]),
-      datasets: [{
-        label: 'Mentions',
-        data: entries.map((entry) => entry[1]),
-        backgroundColor: '#1d4ed8'
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } }
-    }
-  });
-}
-
-function createScatterChart(packets) {
-  const ctx = document.getElementById('scatter-chart');
-  if (!ctx) return;
-
-  state.charts.scatter = new Chart(ctx, {
-    type: 'scatter',
-    data: {
-      datasets: [{
-        label: 'Packet',
-        data: packets.map((p) => ({ x: p.page_count, y: p.currency_mentions, title: p.title })),
-        backgroundColor: 'rgba(14,116,144,0.7)'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: { title: { display: true, text: 'Page Count' } },
-        y: { title: { display: true, text: 'Currency Mentions' } }
-      },
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label(context) {
-              const title = context.raw.title || 'Packet';
-              return `${title}: ${context.raw.x} pages, ${context.raw.y} mentions`;
-            }
-          }
-        }
-      }
-    }
-  });
-}
-
-function createBudgetTrendChart(trend) {
-  const ctx = document.getElementById('budget-trend-chart');
-  if (!ctx) return;
-
-  state.charts.budgetTrend = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: trend.map((t) => formatDate(t.display_date || t.meeting_date || t.sent_date)),
-      datasets: [
-        {
-          label: 'Budget YTD',
-          data: trend.map((t) => t.budget_ytd),
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          tension: 0.25
-        },
-        {
-          label: 'Actual YTD',
-          data: trend.map((t) => t.actual_ytd),
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          tension: 0.25
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom' } }
-    }
-  });
-}
-
-function createExpenseChart(expenseCategories) {
-  const ctx = document.getElementById('expense-chart');
-  if (!ctx) return;
-
-  const entries = Object.entries(expenseCategories || {}).slice(0, 8);
-
-  state.charts.expense = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: entries.map((entry) => entry[0]),
-      datasets: [{
-        data: entries.map((entry) => entry[1]),
-        backgroundColor: [
-          '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
-          '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'
-        ]
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'right' } }
-    }
-  });
-}
-
-function createGivingMonthlyChart(givingMonthly) {
-  const ctx = document.getElementById('giving-monthly-chart');
-  if (!ctx) return;
-
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const entries = Object.entries(givingMonthly || {});
-  const data = months.map(m => {
-    const match = entries.find(e => e[0].toLowerCase().startsWith(m.toLowerCase()));
-    return match ? match[1] : 0;
-  });
-
-  state.charts.givingMonthly = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: months,
-      datasets: [{
-        label: '% of Budget',
-        data,
-        backgroundColor: '#06b6d4'
-      }]
-    },
-    options: {
-      indexAxis: 'x',
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: { y: { beginAtZero: true, max: 120 } },
-      plugins: { legend: { display: false } }
-    }
-  });
-}
-
-function renderPacketDetail(packet) {
-  if (!packet) {
-    el.detail.innerHTML = '<h2>Packet Detail</h2><p>Select a row below to inspect a packet.</p>';
-    return;
-  }
-
-  const topAmounts = (packet.top_amounts || []).slice(0, 5)
-    .map((v) => `<li>${moneyFmt.format(v)}</li>`)
-    .join('');
-
-  const topKeywords = Object.entries(packet.keyword_counts || {})
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([key, count]) => `<li>${key}: ${count}</li>`)
-    .join('');
-
-  el.detail.innerHTML = `
-    <h2>Packet Detail</h2>
-    <p><strong>Title:</strong> ${packet.title}</p>
-    <p><strong>Date:</strong> ${formatDate(packet.display_date || packet.meeting_date || packet.sent_date)}</p>
-    <p><strong>Pages:</strong> ${numberFmt.format(packet.page_count)}</p>
-    <p><strong>Currency Mentions:</strong> ${numberFmt.format(packet.currency_mentions)}</p>
-    <p><strong>Finance Score:</strong> ${numberFmt.format(packet.finance_score)}</p>
-    <p><strong>Top Amounts Detected:</strong></p>
-    <ul>${topAmounts || '<li>None detected</li>'}</ul>
-    <p><strong>Top Keywords:</strong></p>
-    <ul>${topKeywords || '<li>No keywords detected</li>'}</ul>
-  `;
-}
-
-function renderTableRows() {
-  if (!el.tableBody) return;
-
-  const rows = state.filteredPackets.map((packet) => {
-    const active = state.activeFileName === packet.file_name ? 'active' : '';
-    return `
-      <tr data-file="${packet.file_name}" class="${active}">
-        <td>${formatDate(packet.display_date || packet.meeting_date || packet.sent_date)}</td>
-        <td>${packet.title}</td>
-        <td>${numberFmt.format(packet.page_count)}</td>
-        <td>${numberFmt.format(packet.currency_mentions)}</td>
-        <td>${numberFmt.format(packet.finance_score)}</td>
-        <td>${packet.financial_data?.giving_ytd ? moneyFmt.format(packet.financial_data.giving_ytd) : '-'}</td>
-      </tr>
-    `;
-  }).join('');
-
-  el.tableBody.innerHTML = rows || '<tr><td colspan="6">No packets match filter.</td></tr>';
-
-  el.tableBody.querySelectorAll('tr[data-file]').forEach((row) => {
-    row.addEventListener('click', () => {
-      state.activeFileName = row.getAttribute('data-file');
-      renderTableRows();
-      const packet = state.filteredPackets.find((p) => p.file_name === state.activeFileName);
-      renderPacketDetail(packet || null);
-    });
-  });
-}
-
-function applyFilter() {
-  const q = (el.filterInput?.value || '').trim().toLowerCase();
-  const packets = state.data?.packets || [];
-
-  state.filteredPackets = packets.filter((p) => {
-    if (!q) return true;
-    const text = `${p.title} ${p.display_date || p.meeting_date || ''}`.toLowerCase();
-    return text.includes(q);
-  });
-
-  if (!state.filteredPackets.find((p) => p.file_name === state.activeFileName)) {
-    state.activeFileName = state.filteredPackets[0]?.file_name || null;
-  }
-
-  renderTableRows();
-  renderPacketDetail(state.filteredPackets.find((p) => p.file_name === state.activeFileName) || null);
-}
-
+// Load and initialize dashboard
 async function loadDashboard() {
-  const response = await fetch('data/board_packets_data.json', { cache: 'no-store' });
-  if (!response.ok) {
-    throw new Error('Failed to load board packet dataset.');
-  }
+    try {
+        const response = await fetch('data/board_packets_data.json');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        dashboardData = await response.json();
 
-  state.data = await response.json();
-  state.filteredPackets = state.data.packets || [];
-  state.activeFileName = state.filteredPackets[0]?.file_name || null;
+        console.log('Dashboard data loaded:', dashboardData);
 
-  setKpis(state.data.summary || {}, state.data.financial_summary || {});
-  destroyCharts();
-  createTrendChart(state.data.trend || []);
-  createKeywordChart(state.data.finance_keyword_totals || {});
-  createScatterChart(state.data.packets || []);
-  createBudgetTrendChart(state.data.trend || []);
-  createExpenseChart(state.data.top_expense_categories || {});
-  createGivingMonthlyChart(state.data.giving_monthly_averages || {});
+        // Update data date
+        const date = new Date(dashboardData.generated_at);
+        document.getElementById('dataDate').textContent = date.toLocaleDateString();
 
-  renderBudgetDetail();
-  renderGivingReport();
-  applyFilter();
+        // Initialize all data
+        populateKpis();
+        renderCharts();
+        populateTables();
+        attachTabEvents();
+    } catch (error) {
+        console.error('Failed to load dashboard:', error);
+    }
 }
 
-function renderBudgetDetail() {
-  if (!el.budgetDetail || !state.data) return;
+// Populate KPI Cards
+function populateKpis() {
+    const summary = dashboardData.financial_summary;
 
-  const fin = state.data.financial_summary || {};
-  const variance = (fin.total_actual_ytd || 0) - (fin.total_budget_ytd || 0);
-  const status = variance > 0 ? 'Over Budget' : 'Under Budget';
-  const color = variance > 0 ? '#ef4444' : '#10b981';
+    // Overview tab
+    document.getElementById('kpi-giving').textContent = FORMAT.format(summary.total_giving_ytd || 0);
+    document.getElementById('kpi-budget').textContent = FORMAT.format(summary.total_budget_ytd || 0);
+    document.getElementById('kpi-actual').textContent = FORMAT.format(summary.total_actual_ytd || 0);
+    document.getElementById('kpi-variance').textContent = FORMAT.format(summary.average_variance_ytd || 0);
 
-  el.budgetDetail.innerHTML = `
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-      <div>
-        <p><strong>Budget YTD:</strong> ${moneyFmt.format(fin.total_budget_ytd || 0)}</p>
-        <p><strong>Actual YTD:</strong> ${moneyFmt.format(fin.total_actual_ytd || 0)}</p>
-        <p><strong>Variance:</strong> <span style="color: ${color}; font-weight: bold;">${moneyFmt.format(Math.abs(variance))} (${status})</span></p>
-      </div>
-      <div>
-        <p><strong>Average Variance %:</strong> ${numberFmt.format(Math.abs(fin.average_variance_ytd || 0))}%</p>
-      </div>
-    </div>
-  `;
+    // Weekly Offerings tab
+    const weeklyOfferings = dashboardData.packets
+        .flatMap(p => p.financial_data.weekly_offerings || [])
+        .filter(w => w.offering_amount);
+    const avgWeekly = weeklyOfferings.length > 0
+        ? weeklyOfferings.reduce((sum, w) => sum + (w.offering_amount || 0), 0) / weeklyOfferings.length
+        : 0;
+    const weeksOnTarget = weeklyOfferings.filter(w => (w.percent_of_budget || 0) >= 100).length;
+
+    document.getElementById('kpi-avg-weekly').textContent = FORMAT.format(avgWeekly);
+    document.getElementById('kpi-weekly-budget').textContent = weeklyOfferings.length > 0
+        ? FORMAT.format(weeklyOfferings[0].budget_amount || 0)
+        : '$0';
+    document.getElementById('kpi-weeks-target').textContent = weeksOnTarget;
+
+    // Balance Sheet tab
+    const balanceSheets = dashboardData.packets.map(p => p.financial_data.balance_sheet).filter(b => b);
+    const latestBS = balanceSheets.length > 0 ? balanceSheets[balanceSheets.length - 1] : null;
+    if (latestBS) {
+        document.getElementById('kpi-assets').textContent = FORMAT.format(latestBS.total_assets || 0);
+        document.getElementById('kpi-liabilities').textContent = FORMAT.format(latestBS.total_liabilities || 0);
+        document.getElementById('kpi-equity').textContent = FORMAT.format(latestBS.total_equity || 0);
+        document.getElementById('kpi-debt').textContent = FORMAT.format(latestBS.long_term_debt || 0);
+
+        document.getElementById('bs-current-assets').textContent = FORMAT.format(latestBS.current_assets || 0);
+        document.getElementById('bs-fixed-assets').textContent = FORMAT.format(latestBS.fixed_assets || 0);
+        document.getElementById('bs-total-assets').textContent = FORMAT.format(latestBS.total_assets || 0);
+        document.getElementById('bs-unrestricted').textContent = FORMAT.format(latestBS.unrestricted_funds || 0);
+        document.getElementById('bs-restricted').textContent = FORMAT.format(latestBS.restricted_funds || 0);
+        document.getElementById('bs-total-equity').textContent = FORMAT.format(latestBS.total_equity || 0);
+    }
+
+    // Budget vs Actual tab
+    document.getElementById('bva-budget').textContent = FORMAT.format(summary.total_budget_ytd || 0);
+    document.getElementById('bva-actual').textContent = FORMAT.format(summary.total_actual_ytd || 0);
+    document.getElementById('bva-variance').textContent = FORMAT.format(Math.abs(summary.average_variance_ytd || 0));
+    const pctSpent = summary.total_budget_ytd > 0 ? (summary.total_actual_ytd / summary.total_budget_ytd * 100) : 0;
+    document.getElementById('bva-spent').textContent = pctSpent.toFixed(1) + '%';
+
+    // Budget Detail tab
+    const budgetDetails = dashboardData.packets.map(p => p.financial_data.budget_detail).filter(b => b);
+    const latestBD = budgetDetails.length > 0 ? budgetDetails[budgetDetails.length - 1] : null;
+    if (latestBD) {
+        document.getElementById('bd-total-budget').textContent = FORMAT.format(latestBD.ytd_budget || 0);
+        document.getElementById('bd-total-actual').textContent = FORMAT.format(latestBD.ytd_actual || 0);
+        document.getElementById('bd-remaining').textContent = FORMAT.format(Math.max(0, (latestBD.ytd_budget || 0) - (latestBD.ytd_actual || 0)));
+        const monthlyAvg = (latestBD.ytd_actual || 0) / 12;
+        document.getElementById('bd-monthly-avg').textContent = FORMAT.format(monthlyAvg);
+    }
+
+    // Financial Tracking tab
+    document.getElementById('ft-giving').textContent = FORMAT.format(summary.total_giving_ytd || 0);
+    document.getElementById('ft-budget').textContent = FORMAT.format(summary.total_budget_ytd || 0);
+    document.getElementById('ft-actual').textContent = FORMAT.format(summary.total_actual_ytd || 0);
+    document.getElementById('ft-variance').textContent = FORMAT.format(summary.average_variance_ytd || 0);
+
+    // Giving & Donations tab
+    document.getElementById('gd-ytd').textContent = FORMAT.format(summary.total_giving_ytd || 0);
+    const monthCount = Object.keys(dashboardData.giving_monthly_averages || {}).length || 12;
+    document.getElementById('gd-monthly').textContent = FORMAT.format((summary.total_giving_ytd || 0) / monthCount);
+    const givingPct = summary.total_budget_ytd > 0 ? (summary.total_giving_ytd / summary.total_budget_ytd * 100) : 0;
+    document.getElementById('gd-pct').textContent = givingPct.toFixed(0) + '%';
 }
 
-function renderGivingReport() {
-  if (!el.givingReportTable || !state.data) return;
+// Render all charts
+function renderCharts() {
+    renderTrendChart();
+    renderExpenseChart();
+    renderMonthlyChart();
+    renderBudgetPieChart();
+    renderWeeklyOfferingChart();
+    renderWeeklyBudgetChart();
+    renderAssetsChart();
+    renderLiabilitiesChart();
+    renderBudgetTrendChart();
+    renderBudgetUtilChart();
+    renderLineItemChart();
+    renderKeywordChart();
+    renderScatterChart();
+    renderGivingTrendChart();
+    renderGivingBarChart();
+}
 
-  const giving = state.data.giving_monthly_averages || {};
-  const months = Object.keys(giving).sort();
+function renderTrendChart() {
+    const ctx = document.getElementById('trendChart')?.getContext('2d');
+    if (!ctx) return;
 
-  if (months.length === 0) {
-    el.givingReportTable.innerHTML = '<tr><td colspan="3" style="padding: 0.8rem; text-align: center; color: var(--muted);">No monthly data</td></tr>';
-    return;
-  }
+    const trend = dashboardData.trend || [];
+    const labels = trend.map(t => t.display_date || t.sent_date || 'Unknown');
+    const givingData = trend.map(t => t.giving_ytd || 0);
 
-  const rows = months.map((month) => {
-    const pct = giving[month];
-    const status = pct >= 100 ? '✓' : '—';
-    const color = pct >= 100 ? '#10b981' : '#f59e0b';
-    return `
-      <tr style="border-bottom: 1px solid var(--line);">
-        <td style="padding: 0.8rem;">${month}</td>
-        <td style="text-align: right; padding: 0.8rem; font-weight: bold;">${numberFmt.format(Math.round(pct))}%</td>
-        <td style="text-align: center; padding: 0.8rem; color: ${color}; font-weight: bold;">${status}</td>
-      </tr>
+    if (charts.trendChart) charts.trendChart.destroy();
+    charts.trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'YTD Giving',
+                data: givingData,
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: true } }
+        }
+    });
+}
+
+function renderExpenseChart() {
+    const ctx = document.getElementById('expenseChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const expenses = dashboardData.top_expense_categories || {};
+    const labels = Object.keys(expenses);
+    const data = Object.values(expenses);
+
+    if (charts.expenseChart) charts.expenseChart.destroy();
+    charts.expenseChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Amount',
+                data,
+                backgroundColor: '#f59e0b'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y'
+        }
+    });
+}
+
+function renderMonthlyChart() {
+    const ctx = document.getElementById('monthlyChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const monthly = dashboardData.giving_monthly_averages || {};
+    const labels = Object.keys(monthly);
+    const data = Object.values(monthly);
+
+    if (charts.monthlyChart) charts.monthlyChart.destroy();
+    charts.monthlyChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: '% of Budget',
+                data,
+                backgroundColor: '#10b981'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function renderBudgetPieChart() {
+    const ctx = document.getElementById('budgetPieChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const summary = dashboardData.financial_summary;
+    const data = [
+        summary.total_budget_ytd || 0,
+        Math.max(0, (summary.total_actual_ytd || 0) - (summary.total_budget_ytd || 0))
+    ];
+
+    if (charts.budgetPieChart) charts.budgetPieChart.destroy();
+    charts.budgetPieChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Budget', 'Over Budget'],
+            datasets: [{
+                data,
+                backgroundColor: ['#2563eb', '#ef4444']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function renderWeeklyOfferingChart() {
+    const ctx = document.getElementById('weeklyOfferingChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const weekly = dashboardData.packets
+        .flatMap(p => p.financial_data.weekly_offerings || [])
+        .filter(w => w.offering_amount);
+
+    if (charts.weeklyOfferingChart) charts.weeklyOfferingChart.destroy();
+    charts.weeklyOfferingChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: weekly.map((_, i) => `Week ${i + 1}`),
+            datasets: [{
+                label: 'Weekly Offering',
+                data: weekly.map(w => w.offering_amount || 0),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function renderWeeklyBudgetChart() {
+    const ctx = document.getElementById('weeklyBudgetChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const weekly = dashboardData.packets
+        .flatMap(p => p.financial_data.weekly_offerings || [])
+        .filter(w => w.offering_amount);
+
+    if (charts.weeklyBudgetChart) charts.weeklyBudgetChart.destroy();
+    charts.weeklyBudgetChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: weekly.map((_, i) => `Week ${i + 1}`),
+            datasets: [
+                {
+                    label: 'Offering',
+                    data: weekly.map(w => w.offering_amount || 0),
+                    backgroundColor: '#2563eb'
+                },
+                {
+                    label: 'Budget',
+                    data: weekly.map(w => w.budget_amount || 0),
+                    backgroundColor: '#e2e8f0'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function renderAssetsChart() {
+    const ctx = document.getElementById('assetsChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const bs = dashboardData.packets
+        .map(p => p.financial_data.balance_sheet)
+        .filter(b => b)[0] || { current_assets: 0, fixed_assets: 0 };
+
+    if (charts.assetsChart) charts.assetsChart.destroy();
+    charts.assetsChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Current Assets', 'Fixed Assets'],
+            datasets: [{
+                data: [bs.current_assets || 0, bs.fixed_assets || 0],
+                backgroundColor: ['#2563eb', '#f59e0b']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function renderLiabilitiesChart() {
+    const ctx = document.getElementById('liabilitiesChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const bs = dashboardData.packets
+        .map(p => p.financial_data.balance_sheet)
+        .filter(b => b)[0] || { current_liabilities: 0, long_term_debt: 0 };
+
+    if (charts.liabilitiesChart) charts.liabilitiesChart.destroy();
+    charts.liabilitiesChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Current Liabilities', 'Long-term Debt'],
+            datasets: [{
+                data: [bs.current_liabilities || 0, bs.long_term_debt || 0],
+                backgroundColor: ['#ef4444', '#f59e0b']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function renderBudgetTrendChart() {
+    const ctx = document.getElementById('budgetTrendChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const trend = dashboardData.trend || [];
+
+    if (charts.budgetTrendChart) charts.budgetTrendChart.destroy();
+    charts.budgetTrendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: trend.map(t => t.display_date || 'Unknown'),
+            datasets: [
+                {
+                    label: 'Budget',
+                    data: trend.map(t => t.budget_ytd || 0),
+                    borderColor: '#2563eb',
+                    tension: 0.4
+                },
+                {
+                    label: 'Actual',
+                    data: trend.map(t => t.actual_ytd || 0),
+                    borderColor: '#ef4444',
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function renderBudgetUtilChart() {
+    const ctx = document.getElementById('budgetUtilChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const summary = dashboardData.financial_summary;
+    const pctSpent = summary.total_budget_ytd > 0 ? (summary.total_actual_ytd / summary.total_budget_ytd * 100) : 0;
+
+    if (charts.budgetUtilChart) charts.budgetUtilChart.destroy();
+    charts.budgetUtilChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Spent', 'Remaining'],
+            datasets: [{
+                data: [Math.min(pctSpent, 100), Math.max(0, 100 - pctSpent)],
+                backgroundColor: [pctSpent > 100 ? '#ef4444' : '#10b981', '#e2e8f0']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function renderLineItemChart() {
+    const ctx = document.getElementById('lineItemChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const bd = dashboardData.packets
+        .map(p => p.financial_data.budget_detail)
+        .filter(b => b && b.line_items && b.line_items.length > 0)[0];
+
+    if (!bd || !bd.line_items) return;
+
+    const labels = bd.line_items.map(li => li[0]);
+    const budgets = bd.line_items.map(li => li[1] || 0);
+    const actuals = bd.line_items.map(li => li[2] || 0);
+
+    if (charts.lineItemChart) charts.lineItemChart.destroy();
+    charts.lineItemChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Budget', data: budgets, backgroundColor: '#2563eb' },
+                { label: 'Actual', data: actuals, backgroundColor: '#f59e0b' }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y'
+        }
+    });
+}
+
+function renderKeywordChart() {
+    const ctx = document.getElementById('keywordChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const keywords = dashboardData.finance_keyword_totals || {};
+    const labels = Object.keys(keywords).slice(0, 8);
+    const data = labels.map(k => keywords[k]);
+
+    if (charts.keywordChart) charts.keywordChart.destroy();
+    charts.keywordChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Frequency',
+                data,
+                backgroundColor: '#8b5cf6'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function renderScatterChart() {
+    const ctx = document.getElementById('scatterChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const trend = dashboardData.trend || [];
+    const data = trend.map(t => ({
+        x: t.currency_mentions || 0,
+        y: t.finance_score || 0
+    }));
+
+    if (charts.scatterChart) charts.scatterChart.destroy();
+    charts.scatterChart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Finance Score vs Mentions',
+                data,
+                backgroundColor: '#ec4899'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { title: { display: true, text: 'Currency Mentions' } },
+                y: { title: { display: true, text: 'Finance Score' } }
+            }
+        }
+    });
+}
+
+function renderGivingTrendChart() {
+    const ctx = document.getElementById('givingTrendChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const trend = dashboardData.trend || [];
+
+    if (charts.givingTrendChart) charts.givingTrendChart.destroy();
+    charts.givingTrendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: trend.map(t => t.display_date || 'Unknown'),
+            datasets: [{
+                label: 'YTD Giving',
+                data: trend.map(t => t.giving_ytd || 0),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function renderGivingBarChart() {
+    const ctx = document.getElementById('givingBarChart')?.getContext('2d');
+    if (!ctx) return;
+
+    const monthly = dashboardData.giving_monthly_averages || {};
+    const labels = Object.keys(monthly);
+    const data = Object.values(monthly);
+
+    if (charts.givingBarChart) charts.givingBarChart.destroy();
+    charts.givingBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: '% of Budget',
+                data,
+                backgroundColor: data.map(v => v >= 100 ? '#10b981' : '#f59e0b')
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+// Populate Tables
+function populateTables() {
+    populateRecentPacketsTable();
+    populateWeeklyOfferingsTable();
+    populateBalanceSheetTable();
+    populateBudgetSummaryTable();
+    populateBudgetDetailTable();
+    populateFinancialSummaryTable();
+    populateGivingReportTable();
+    populatePacketsTable();
+}
+
+function populateRecentPacketsTable() {
+    const tbody = document.getElementById('recentPacketsTable')?.querySelector('tbody');
+    if (!tbody) return;
+
+    const recent = (dashboardData.packets || []).slice(-5);
+    tbody.innerHTML = recent.map(p => `
+        <tr>
+            <td>${p.display_date || p.sent_date || 'N/A'}</td>
+            <td>${p.title}</td>
+            <td>${p.page_count}</td>
+            <td>${p.currency_mentions}</td>
+            <td>${p.finance_score}</td>
+        </tr>
+    `).join('');
+}
+
+function populateWeeklyOfferingsTable() {
+    const tbody = document.getElementById('weeklyOfferingsTable')?.querySelector('tbody');
+    if (!tbody) return;
+
+    const weekly = dashboardData.packets
+        .flatMap(p => p.financial_data.weekly_offerings || [])
+        .filter(w => w.offering_amount);
+
+    tbody.innerHTML = weekly.map((w, i) => {
+        const status = (w.percent_of_budget || 0) >= 100 ? 'On Target' : 'Below Target';
+        const statusClass = (w.percent_of_budget || 0) >= 100 ? 'status-good' : 'status-warning';
+        return `
+            <tr>
+                <td>Week ${i + 1}</td>
+                <td>${FORMAT.format(w.offering_amount || 0)}</td>
+                <td>${FORMAT.format(w.budget_amount || 0)}</td>
+                <td>${(w.percent_of_budget || 0).toFixed(1)}%</td>
+                <td><span class="${statusClass}">${status}</span></td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function populateBalanceSheetTable() {
+    const tbody = document.getElementById('balanceSheetTable')?.querySelector('tbody');
+    if (!tbody) return;
+
+    const bs = dashboardData.packets
+        .map(p => p.financial_data.balance_sheet)
+        .filter(b => b)[0];
+
+    if (!bs) return;
+
+    const total = bs.total_assets || 0;
+    const items = [
+        ['Current Assets', bs.current_assets || 0],
+        ['Fixed Assets', bs.fixed_assets || 0],
+        ['Current Liabilities', bs.current_liabilities || 0],
+        ['Long-term Debt', bs.long_term_debt || 0]
+    ];
+
+    tbody.innerHTML = items.map(([name, amount]) => {
+        const pct = total > 0 ? (amount / total * 100).toFixed(1) : 0;
+        return `
+            <tr>
+                <td>${name}</td>
+                <td class="amount">${FORMAT.format(amount)}</td>
+                <td style="text-align: right;">${pct}%</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function populateBudgetSummaryTable() {
+    const tbody = document.getElementById('budgetSummaryTable')?.querySelector('tbody');
+    if (!tbody) return;
+
+    const summary = dashboardData.financial_summary;
+    const variance = summary.average_variance_ytd || 0;
+    const status = variance >= 0 ? '<span class="status-good">Positive</span>' : '<span class="status-danger">Negative</span>';
+
+    tbody.innerHTML = `
+        <tr>
+            <td>YTD Budget</td>
+            <td class="amount">${FORMAT.format(summary.total_budget_ytd || 0)}</td>
+            <td class="amount">${FORMAT.format(summary.total_budget_ytd || 0)}</td>
+            <td class="amount">$0</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td>YTD Actual</td>
+            <td class="amount">${FORMAT.format(summary.total_budget_ytd || 0)}</td>
+            <td class="amount">${FORMAT.format(summary.total_actual_ytd || 0)}</td>
+            <td class="amount">${FORMAT.format(Math.abs(variance))}</td>
+            <td>${status}</td>
+        </tr>
     `;
-  }).join('');
-
-  el.givingReportTable.innerHTML = rows;
 }
 
-function attachEvents() {
-  el.filterInput?.addEventListener('input', applyFilter);
-  el.refreshBtn?.addEventListener('click', () => {
-    loadDashboard().catch((err) => {
-      console.error(err);
-      alert('Could not refresh dashboard data.');
-    });
-  });
+function populateBudgetDetailTable() {
+    const tbody = document.getElementById('budgetDetailTable')?.querySelector('tbody');
+    if (!tbody) return;
 
-  el.tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      const newTab = tab.getAttribute('data-tab');
-      state.activeTab = newTab;
-      
-      el.tabs.forEach((t) => t.classList.remove('active'));
-      tab.classList.add('active');
+    const bd = dashboardData.packets
+        .map(p => p.financial_data.budget_detail)
+        .filter(b => b && b.line_items)[0];
 
-      el.tabPages.forEach((page) => page.classList.remove('active'));
-      document.querySelector(`[data-page="${newTab}"]`)?.classList.add('active');
+    if (!bd || !bd.line_items) return;
 
-      // Redraw charts on tab change to fix canvas sizing
-      setTimeout(() => {
-        Object.values(state.charts).forEach(chart => chart?.resize?.());
-      }, 100);
-    });
-  });
+    tbody.innerHTML = bd.line_items.map(([name, budget, actual]) => {
+        const variance = actual - budget;
+        const pctUsed = budget > 0 ? (actual / budget * 100) : 0;
+        const status = pctUsed > 100 ? '<span class="status-danger">Over</span>' : '<span class="status-good">Under</span>';
+
+        return `
+            <tr>
+                <td>${name}</td>
+                <td class="amount">${FORMAT.format(budget)}</td>
+                <td class="amount">${FORMAT.format(actual)}</td>
+                <td class="amount" style="color: ${variance > 0 ? '#ef4444' : '#10b981'};">${FORMAT.format(variance)}</td>
+                <td>${pctUsed.toFixed(1)}%</td>
+                <td>${status}</td>
+            </tr>
+        `;
+    }).join('');
 }
 
-attachEvents();
-loadDashboard().catch((err) => {
-  console.error(err);
-  if (el.detail) {
-    el.detail.innerHTML = '<h2>Packet Detail</h2><p>Unable to load dashboard data.</p>';
-  }
-});
+function populateFinancialSummaryTable() {
+    const tbody = document.getElementById('financialSummaryBody');
+    if (!tbody) return;
+
+    const summary = dashboardData.financial_summary;
+    const variance = summary.average_variance_ytd || 0;
+
+    tbody.innerHTML = `
+        <tr>
+            <td>YTD Giving</td>
+            <td>${FORMAT.format(summary.total_giving_ytd || 0)}</td>
+            <td><span class="status-good">✓</span></td>
+        </tr>
+        <tr>
+            <td>YTD Budget</td>
+            <td>${FORMAT.format(summary.total_budget_ytd || 0)}</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td>YTD Actual Spend</td>
+            <td>${FORMAT.format(summary.total_actual_ytd || 0)}</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td><strong>Budget Variance</strong></td>
+            <td><strong>${FORMAT.format(variance)}</strong></td>
+            <td><strong>${variance >= 0 ? '<span class="status-good">Positive</span>' : '<span class="status-danger">Negative</span>'}</strong></td>
+        </tr>
+    `;
+}
+
+function populateGivingReportTable() {
+    const tbody = document.getElementById('givingReportBody');
+    if (!tbody) return;
+
+    const monthly = dashboardData.giving_monthly_averages || {};
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    tbody.innerHTML = months.map(month => {
+        const pct = monthly[month] || 0;
+        const status = pct >= 100 ? '<span class="status-good">✓ On Target</span>' : '<span class="status-warning">Below Target</span>';
+        return `
+            <tr>
+                <td>${month}</td>
+                <td>${pct.toFixed(1)}%</td>
+                <td>${status}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function populatePacketsTable() {
+    const tbody = document.getElementById('packetsTable')?.querySelector('tbody');
+    if (!tbody) return;
+
+    const packets = dashboardData.packets || [];
+    tbody.innerHTML = packets.map(p => `
+        <tr>
+            <td>${p.display_date || p.sent_date || 'N/A'}</td>
+            <td>${p.title}</td>
+            <td>${p.page_count}</td>
+            <td>${p.currency_mentions}</td>
+            <td>${p.finance_score}</td>
+        </tr>
+    `).join('');
+}
+
+// Tab Navigation
+function attachTabEvents() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.getAttribute('data-tab');
+            switchTab(tabName);
+        });
+    });
+}
+
+function switchTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    // Remove active from all buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Show selected tab
+    const tab = document.getElementById(tabName);
+    if (tab) {
+        tab.classList.add('active');
+    }
+
+    // Mark button as active
+    const btn = document.querySelector(`[data-tab="${tabName}"]`);
+    if (btn) {
+        btn.classList.add('active');
+    }
+
+    // Trigger chart refresh
+    setTimeout(() => {
+        Object.values(charts).forEach(chart => {
+            if (chart && chart.resize) chart.resize();
+        });
+    }, 100);
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', loadDashboard);

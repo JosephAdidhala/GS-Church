@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T00:12:17.374971Z",
+  "generated_at": "2026-05-14T00:32:43.279631Z",
   "source_dir": "/Users/joey/Documents/GitHub/Workouts/church/downloads/board-packets",
   "summary": {
     "packet_count": 12,
@@ -263,7 +263,67 @@
             "Facilities",
             47157.0
           ]
-        ]
+        ],
+        "balance_sheet": {
+          "total_assets": null,
+          "current_assets": null,
+          "fixed_assets": 6732125.4,
+          "total_liabilities": null,
+          "current_liabilities": 98481.48,
+          "long_term_debt": 3657198.42,
+          "total_equity": 13.0,
+          "unrestricted_funds": 3882229.42,
+          "restricted_funds": null
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": [
+            [
+              "February",
+              2.0,
+              4.0
+            ],
+            [
+              "Vote Required  \no January",
+              27.0,
+              2025.0
+            ],
+            [
+              "2025 Board Calendar  \n \n \nPrayer & Adjournment  \n  Board Meeting  \n  \nBoard of Directors  \n& Annual Training  \nMinutes  \nJanuary",
+              27.0,
+              2025.0
+            ],
+            [
+              "Minutes November",
+              18.0,
+              2024.0
+            ],
+            [
+              "Code of Conduct and Conflict of Interest forms  \nMinutes recorded by Ginger McLain  \n4 of",
+              17.0,
+              4.0
+            ],
+            [
+              "oKim Yarboro was thanked for the New Member Training session on January",
+              13.0,
+              2025.0
+            ],
+            [
+              "of budget for capital projects allocation\noRob Watson and Ginger McLain will work on some metrics to create a snapshot for future\nBoard financial reporting\n5 of",
+              17.0,
+              5.0
+            ],
+            [
+              "Schools\nBy Kim Wright\noSchool Committee will meet on  February",
+              10.0,
+              2025.0
+            ]
+          ]
+        }
       }
     },
     {
@@ -307,7 +367,67 @@
         "budget_ytd": 2454814.0,
         "actual_ytd": 2734619.0,
         "variance_ytd": 279804.0,
-        "top_expenses": []
+        "top_expenses": [],
+        "balance_sheet": {
+          "total_assets": null,
+          "current_assets": null,
+          "fixed_assets": null,
+          "total_liabilities": null,
+          "current_liabilities": null,
+          "long_term_debt": null,
+          "total_equity": null,
+          "unrestricted_funds": null,
+          "restricted_funds": null
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": [
+            [
+              "March",
+              31.0,
+              2025.0
+            ],
+            [
+              "Future  Meetings\noApril",
+              24.0,
+              2025.0
+            ],
+            [
+              "Executive  Team\noApril",
+              28.0,
+              2025.0
+            ],
+            [
+              "Governance Team\noApril",
+              28.0,
+              2025.0
+            ],
+            [
+              "00\noApril",
+              28.0,
+              2025.0
+            ],
+            [
+              "00Board  Meeting  Monday  March",
+              31.0,
+              2025.0
+            ],
+            [
+              "Meeting Room",
+              321.0,
+              3.0
+            ],
+            [
+              "3\nBoard of Dir\nectors  \nMinutes \nFe\nbruary",
+              24.0,
+              2025.0
+            ]
+          ]
+        }
       }
     },
     {
@@ -351,7 +471,67 @@
         "budget_ytd": null,
         "actual_ytd": null,
         "variance_ytd": null,
-        "top_expenses": []
+        "top_expenses": [],
+        "balance_sheet": {
+          "total_assets": null,
+          "current_assets": null,
+          "fixed_assets": null,
+          "total_liabilities": null,
+          "current_liabilities": null,
+          "long_term_debt": null,
+          "total_equity": null,
+          "unrestricted_funds": null,
+          "restricted_funds": null
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": [
+            [
+              "April",
+              28.0,
+              2025.0
+            ],
+            [
+              "00 pm \n  \nInformation Packet \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nPage Intentionally Blank \n  \n \n \nWelcome & Prayer \n \n  Guest  Jamie Howell Director of GS School   \n \nReports \n Minutes\no Previous meeting minutes\n Committees\no Finance\no School\no Trustee\no Human Resources\no Missions\no Governance\n \nContinuing Business \n \nNew Business  \n \nPrayer & Adjournment  \n \n \n \n Future Meetings\no May",
+              15.0,
+              2025.0
+            ],
+            [
+              "Executive Team  \no May",
+              19.0,
+              2025.0
+            ],
+            [
+              "Governance Team  \no May",
+              19.0,
+              2025.0
+            ],
+            [
+              "00  \no May",
+              19.0,
+              2025.0
+            ],
+            [
+              "00",
+              3.0,
+              3.0
+            ],
+            [
+              "Board Meeting Monday April",
+              28.0,
+              2025.0
+            ],
+            [
+              "Meeting Room 321  \n \n \n \n \n \n \n \n \n \n \nBoard of Directors  \nMinutes \n \nMarch",
+              31.0,
+              2025.0
+            ]
+          ]
+        }
       }
     },
     {
@@ -413,7 +593,62 @@
             "Facilities",
             46473.0
           ]
-        ]
+        ],
+        "balance_sheet": {
+          "total_assets": null,
+          "current_assets": null,
+          "fixed_assets": 6732125.4,
+          "total_liabilities": null,
+          "current_liabilities": 65997.52,
+          "long_term_debt": 3614432.04,
+          "total_equity": null,
+          "unrestricted_funds": 3897128.7,
+          "restricted_funds": 3897128.7
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": [
+            [
+              "2025  \nRoom",
+              321.0,
+              7.0
+            ],
+            [
+              "Executive  Team\noJune",
+              16.0,
+              2025.0
+            ],
+            [
+              "Governance Team\noJune",
+              30.0,
+              2025.0
+            ],
+            [
+              "Good Shepherd Church of Charlotte  \nBoard of Directors \nMinutes  \nApril",
+              28.0,
+              2025.0
+            ],
+            [
+              "Minutes March",
+              31.0,
+              2025.0
+            ],
+            [
+              "Financial Report March 2025  \nMinutes recorded by Lindsay Mackey",
+              4.0,
+              4.0
+            ],
+            [
+              "Joseph Adidhala prayed thanking God\nMinut es from the March",
+              31.0,
+              2025.0
+            ]
+          ]
+        }
       }
     },
     {
@@ -475,7 +710,47 @@
             "Building",
             88909.0
           ]
-        ]
+        ],
+        "balance_sheet": {
+          "total_assets": null,
+          "current_assets": null,
+          "fixed_assets": 6732125.4,
+          "total_liabilities": null,
+          "current_liabilities": 80278.14,
+          "long_term_debt": 3600093.1,
+          "total_equity": null,
+          "unrestricted_funds": 3856791.04,
+          "restricted_funds": 3856791.04
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": [
+            [
+              "2025  \nRoom",
+              321.0,
+              7.0
+            ],
+            [
+              "2025   Meeting Room",
+              321.0,
+              3.0
+            ],
+            [
+              "Minutes April",
+              28.0,
+              2025.0
+            ],
+            [
+              "Financial Report April  2025  \nMinutes recorded by Lindsay Mackey",
+              4.0,
+              6.0
+            ]
+          ]
+        }
       }
     },
     {
@@ -537,7 +812,42 @@
             "Building",
             89729.0
           ]
-        ]
+        ],
+        "balance_sheet": {
+          "total_assets": null,
+          "current_assets": null,
+          "fixed_assets": 6704319.55,
+          "total_liabilities": null,
+          "current_liabilities": 104523.71,
+          "long_term_debt": 3586037.9,
+          "total_equity": null,
+          "unrestricted_funds": 2881808.88,
+          "restricted_funds": 2881808.88
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": [
+            [
+              "2025  \nRoom",
+              321.0,
+              7.0
+            ],
+            [
+              "Minutes May",
+              28.0,
+              2025.0
+            ],
+            [
+              "Financial Report June  2025  \nMinutes recorded by Lindsay Mackey",
+              4.0,
+              7.0
+            ]
+          ]
+        }
       }
     },
     {
@@ -599,7 +909,57 @@
             "Missions",
             35461.0
           ]
-        ]
+        ],
+        "balance_sheet": {
+          "total_assets": null,
+          "current_assets": null,
+          "fixed_assets": 6704319.55,
+          "total_liabilities": null,
+          "current_liabilities": 81579.78,
+          "long_term_debt": 3571602.48,
+          "total_equity": 12.0,
+          "unrestricted_funds": 3781518.63,
+          "restricted_funds": 3781518.63
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": [
+            [
+              "2025  \nRoom",
+              321.0,
+              7.0
+            ],
+            [
+              "Future  Meetings\noSeptember",
+              18.0,
+              2025.0
+            ],
+            [
+              "00\noSeptember",
+              29.0,
+              2025.0
+            ],
+            [
+              "2025   Meeting Room 321 \n\nBoard of Directors \nMinutes  \nJuly",
+              28.0,
+              2025.0
+            ],
+            [
+              "Timeline and \n Members \nMinutes recorded by Lindsay Mackey",
+              4.0,
+              8.0
+            ],
+            [
+              "Minutes from the June",
+              23.0,
+              2025.0
+            ]
+          ]
+        }
       }
     },
     {
@@ -661,7 +1021,67 @@
             "Missions",
             42736.0
           ]
-        ]
+        ],
+        "balance_sheet": {
+          "total_assets": null,
+          "current_assets": null,
+          "fixed_assets": 6703994.07,
+          "total_liabilities": null,
+          "current_liabilities": 64938.91,
+          "long_term_debt": 3543295.69,
+          "total_equity": 10.0,
+          "unrestricted_funds": 4371381.33,
+          "restricted_funds": 4371381.33
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": [
+            [
+              "October",
+              27.0,
+              2025.0
+            ],
+            [
+              "Room",
+              321.0,
+              7.0
+            ],
+            [
+              "00 pm \nInformation Packet\n\nPage Intentionally Blank  \nWelcome & Prayer \nReports \nxMinutes\nxCommittees\noFinance\noSchool\noTrustee\noHuman Resources\noMission Snapshot\noGovernance\noSuccession Planning Committee\nxSeptember",
+              29.0,
+              2025.0
+            ],
+            [
+              "Committee Chairs\nPrayer & Adjournment  \nxFuture Meetings\noNovember",
+              10.0,
+              2025.0
+            ],
+            [
+              "30 pm School Committee\noNovember",
+              13.0,
+              2025.0
+            ],
+            [
+              "00 pm Executive Team\noNovember",
+              17.0,
+              2025.0
+            ],
+            [
+              "00 pm Governance Team\noNovember",
+              17.0,
+              2025.0
+            ],
+            [
+              "00 pm Finance Team\noNovember",
+              17.0,
+              2025.0
+            ]
+          ]
+        }
       }
     },
     {
@@ -696,7 +1116,26 @@
         "budget_ytd": null,
         "actual_ytd": null,
         "variance_ytd": null,
-        "top_expenses": []
+        "top_expenses": [],
+        "balance_sheet": {
+          "total_assets": null,
+          "current_assets": null,
+          "fixed_assets": null,
+          "total_liabilities": null,
+          "current_liabilities": null,
+          "long_term_debt": null,
+          "total_equity": null,
+          "unrestricted_funds": null,
+          "restricted_funds": null
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": []
+        }
       }
     },
     {
@@ -758,7 +1197,67 @@
             "Building",
             92084.0
           ]
-        ]
+        ],
+        "balance_sheet": {
+          "total_assets": 10.0,
+          "current_assets": null,
+          "fixed_assets": 6703994.07,
+          "total_liabilities": 3577750.0,
+          "current_liabilities": 63237.36,
+          "long_term_debt": 3514512.64,
+          "total_equity": 177663.92,
+          "unrestricted_funds": 3887837.95,
+          "restricted_funds": 3887837.95
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": [
+            [
+              "Board  Meeting  & Annual  Training    \n \n \n \nBoard Meeting  \nAnnual  Board  Training \nInformation Packet  \nMeeting Room",
+              323.0,
+              6.0
+            ],
+            [
+              "February",
+              9.0,
+              2026.0
+            ],
+            [
+              "May  25 Board  Meeting  & Training  February",
+              9.0,
+              2026.0
+            ],
+            [
+              "Good  Shepherd  Church  of Charlotte  \nBoard  Meeting  & Annual  Training  Page 3 o1f 18 \nPage  3 of 18   \n \n \n \n \nBoard  of Directors  \nMinutes  \n \nDecember",
+              8.0,
+              2025.0
+            ],
+            [
+              "Minutes October",
+              27.0,
+              2025.0
+            ],
+            [
+              "Minutes  from  the October",
+              27.0,
+              2025.0
+            ],
+            [
+              "The October",
+              27.0,
+              2025.0
+            ],
+            [
+              "School  by Kim Wright  \no Committee  meeting  was November",
+              10.0,
+              2026.0
+            ]
+          ]
+        }
       }
     },
     {
@@ -820,7 +1319,62 @@
             "Building",
             92084.0
           ]
-        ]
+        ],
+        "balance_sheet": {
+          "total_assets": 10.0,
+          "current_assets": null,
+          "fixed_assets": 6703994.07,
+          "total_liabilities": null,
+          "current_liabilities": 63237.36,
+          "long_term_debt": 3514512.64,
+          "total_equity": null,
+          "unrestricted_funds": 3887837.95,
+          "restricted_funds": 3887837.95
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": [
+            [
+              "February",
+              2.0,
+              202.0
+            ],
+            [
+              "May 25   Board  Meeting  & Training    February",
+              2.0,
+              2026.0
+            ],
+            [
+              "00 pm  \nRoom",
+              3.0,
+              38.0
+            ],
+            [
+              "The October",
+              27.0,
+              2025.0
+            ],
+            [
+              "School by Kim Wright\noCommittee meeting was November",
+              10.0,
+              2026.0
+            ],
+            [
+              "oStaff Appreciation  Luncheon on December",
+              11.0,
+              2025.0
+            ],
+            [
+              "January",
+              2.0,
+              6.0
+            ]
+          ]
+        }
       }
     },
     {
@@ -882,7 +1436,57 @@
             "Missions",
             45222.0
           ]
-        ]
+        ],
+        "balance_sheet": {
+          "total_assets": null,
+          "current_assets": null,
+          "fixed_assets": 6703994.07,
+          "total_liabilities": null,
+          "current_liabilities": 77861.25,
+          "long_term_debt": 3471198.63,
+          "total_equity": 10.0,
+          "unrestricted_funds": 4098509.6,
+          "restricted_funds": 4098509.6
+        },
+        "weekly_offerings": [],
+        "budget_detail": {
+          "ytd_budget": null,
+          "ytd_actual": null,
+          "ytd_variance": null,
+          "percent_spent": null,
+          "line_items": [
+            [
+              "RM",
+              321.0,
+              2.0
+            ],
+            [
+              "of",
+              15.0,
+              2.0
+            ],
+            [
+              "of 15\nBoard of Directors \nMinutes  \nF\nebruary",
+              23.0,
+              202.0
+            ],
+            [
+              "30 pm \nR\noom",
+              3.0,
+              23.0
+            ],
+            [
+              "Tamara Buie Board Resignation  \nMinutes recorded by Lindsay Mackey  \n3 of",
+              15.0,
+              3.0
+            ],
+            [
+              "is",
+              10.0,
+              8.0
+            ]
+          ]
+        }
       }
     }
   ]

@@ -55,6 +55,36 @@ EXPENSE_PATTERN = re.compile(
 
 
 @dataclass
+class BalanceSheet:
+    total_assets: float | None
+    current_assets: float | None
+    fixed_assets: float | None
+    total_liabilities: float | None
+    current_liabilities: float | None
+    long_term_debt: float | None
+    total_equity: float | None
+    unrestricted_funds: float | None
+    restricted_funds: float | None
+
+
+@dataclass
+class BudgetDetail:
+    ytd_budget: float | None
+    ytd_actual: float | None
+    ytd_variance: float | None
+    percent_spent: float | None
+    line_items: list[tuple[str, float, float]]  # (category, budget, actual)
+
+
+@dataclass
+class WeeklyOffering:
+    week_num: int | None
+    offering_amount: float | None
+    budget_amount: float | None
+    percent_of_budget: float | None
+
+
+@dataclass
 class FinancialData:
     giving_monthly: dict[str, float]
     giving_ytd: float | None
@@ -62,6 +92,9 @@ class FinancialData:
     actual_ytd: float | None
     variance_ytd: float | None
     top_expenses: list[tuple[str, float]]
+    balance_sheet: BalanceSheet | None
+    weekly_offerings: list[WeeklyOffering]
+    budget_detail: BudgetDetail | None
 
 
 @dataclass
@@ -140,6 +173,187 @@ def extract_amounts(text: str) -> list[float]:
     return values
 
 
+def extract_balance_sheet(text: str) -> BalanceSheet:
+    """Extract balance sheet data from PDF text."""
+    total_assets = None
+    current_assets = None
+    fixed_assets = None
+    total_liabilities = None
+    current_liabilities = None
+    long_term_debt = None
+    total_equity = None
+    unrestricted_funds = None
+    restricted_funds = None
+
+    # Extract total assets
+    assets_match = re.search(r"Total\s+(?:Current\s+)?Assets?\s*\$?\s*([\d,]+(?:\.\d{2})?)", text, re.IGNORECASE)
+    if assets_match:
+        try:
+            total_assets = float(assets_match.group(1).replace(",", ""))
+        except ValueError:
+            pass
+
+    # Extract current assets
+    curr_assets_match = re.search(r"Total\s+Current\s+Assets?\s*\$?\s*([\d,]+(?:\.\d{2})?)", text, re.IGNORECASE)
+    if curr_assets_match:
+        try:
+            current_assets = float(curr_assets_match.group(1).replace(",", ""))
+        except ValueError:
+            pass
+
+    # Extract fixed assets
+    fixed_match = re.search(r"Total\s+Fixed\s+Assets?\s*\$?\s*([\d,]+(?:\.\d{2})?)", text, re.IGNORECASE)
+    if fixed_match:
+        try:
+            fixed_assets = float(fixed_match.group(1).replace(",", ""))
+        except ValueError:
+            pass
+
+    # Extract liabilities
+    liab_match = re.search(r"Total\s+Liabilities?\s*\$?\s*([\d,]+(?:\.\d{2})?)", text, re.IGNORECASE)
+    if liab_match:
+        try:
+            total_liabilities = float(liab_match.group(1).replace(",", ""))
+        except ValueError:
+            pass
+
+    # Extract current liabilities
+    curr_liab_match = re.search(r"Total\s+Current\s+Liabilities?\s*\$?\s*([\d,]+(?:\.\d{2})?)", text, re.IGNORECASE)
+    if curr_liab_match:
+        try:
+            current_liabilities = float(curr_liab_match.group(1).replace(",", ""))
+        except ValueError:
+            pass
+
+    # Extract long-term debt / mortgage
+    debt_match = re.search(r"(?:Mortgage|Debt|Long[\s-]*term[\s-]*(?:Liabilities|Debt)?)\s*\$?\s*([\d,]+(?:\.\d{2})?)", text, re.IGNORECASE)
+    if debt_match:
+        try:
+            long_term_debt = float(debt_match.group(1).replace(",", ""))
+        except ValueError:
+            pass
+
+    # Extract equity
+    equity_match = re.search(r"Total\s+Equity\s*\$?\s*([\d,]+(?:\.\d{2})?)", text, re.IGNORECASE)
+    if equity_match:
+        try:
+            total_equity = float(equity_match.group(1).replace(",", ""))
+        except ValueError:
+            pass
+
+    # Extract unrestricted funds
+    unrestricted_match = re.search(r"(?:Unrestricted|Unrestricted\s+Fund\s+Balance)[s]?\s*\$?\s*([\d,]+(?:\.\d{2})?)", text, re.IGNORECASE)
+    if unrestricted_match:
+        try:
+            unrestricted_funds = float(unrestricted_match.group(1).replace(",", ""))
+        except ValueError:
+            pass
+
+    # Extract restricted funds
+    restricted_match = re.search(r"(?:Restricted|Restricted\s+Fund[s]?\s+Balance)[s]?\s*\$?\s*([\d,]+(?:\.\d{2})?)", text, re.IGNORECASE)
+    if restricted_match:
+        try:
+            restricted_funds = float(restricted_match.group(1).replace(",", ""))
+        except ValueError:
+            pass
+
+    return BalanceSheet(
+        total_assets=total_assets,
+        current_assets=current_assets,
+        fixed_assets=fixed_assets,
+        total_liabilities=total_liabilities,
+        current_liabilities=current_liabilities,
+        long_term_debt=long_term_debt,
+        total_equity=total_equity,
+        unrestricted_funds=unrestricted_funds,
+        restricted_funds=restricted_funds,
+    )
+
+
+def extract_weekly_offerings(text: str) -> list[WeeklyOffering]:
+    """Extract weekly offering data from PDF text."""
+    offerings = []
+    
+    # Look for weekly offering patterns
+    weekly_pattern = re.findall(
+        r"Week\s+(?:(\d+)|#(\d+)).*?(?:\$[\d,]+(?:\.\d{2})?)",
+        text,
+        re.IGNORECASE
+    )
+    
+    # Look for offering amount vs budget
+    offering_data = re.findall(
+        r"(?:Weekly\s+)?Offering[s]?:\s*\$?\s*([\d,]+(?:\.\d{2})?)\s+.*?Budget\s*\$?\s*([\d,]+(?:\.\d{2})?)",
+        text,
+        re.IGNORECASE
+    )
+    
+    for offering, budget in offering_data:
+        try:
+            off_amt = float(offering.replace(",", ""))
+            bud_amt = float(budget.replace(",", ""))
+            pct = (off_amt / bud_amt * 100) if bud_amt > 0 else 0
+            offerings.append(WeeklyOffering(
+                week_num=None,
+                offering_amount=off_amt,
+                budget_amount=bud_amt,
+                percent_of_budget=round(pct, 1)
+            ))
+        except ValueError:
+            pass
+
+    return offerings
+
+
+def extract_budget_detail(text: str) -> BudgetDetail:
+    """Extract budget detail information from PDF text."""
+    ytd_budget = None
+    ytd_actual = None
+    ytd_variance = None
+    percent_spent = None
+    line_items = []
+
+    # Extract YTD summary
+    budget_match = re.search(
+        r"Budget\s*\$?\s*([\d,]+(?:\.\d{2})?)\s+.*?Actual\s*\$?\s*([\d,]+(?:\.\d{2})?)\s+.*?Variance\s*\$?\s*([\d,]+(?:\.\d{2})?)",
+        text,
+        re.IGNORECASE
+    )
+    
+    if budget_match:
+        try:
+            ytd_budget = float(budget_match.group(1).replace(",", ""))
+            ytd_actual = float(budget_match.group(2).replace(",", ""))
+            ytd_variance = float(budget_match.group(3).replace(",", ""))
+            if ytd_budget > 0:
+                percent_spent = (ytd_actual / ytd_budget * 100)
+        except ValueError:
+            pass
+
+    # Extract line items (categories with budget and actual)
+    line_item_pattern = re.findall(
+        r"([\w\s&]+?)\s+\$?\s*([\d,]+(?:\.\d{2})?)\s+\$?\s*([\d,]+(?:\.\d{2})?)",
+        text,
+        re.IGNORECASE
+    )
+    
+    for category, budget, actual in line_item_pattern[:10]:  # Top 10 line items
+        try:
+            bud = float(budget.replace(",", ""))
+            act = float(actual.replace(",", ""))
+            line_items.append((category.strip(), bud, act))
+        except ValueError:
+            pass
+
+    return BudgetDetail(
+        ytd_budget=ytd_budget,
+        ytd_actual=ytd_actual,
+        ytd_variance=ytd_variance,
+        percent_spent=percent_spent,
+        line_items=line_items[:8]  # Top 8 line items
+    )
+
+
 def extract_financial_data(text: str) -> FinancialData:
     giving_monthly = {}
     giving_ytd = None
@@ -193,6 +407,15 @@ def extract_financial_data(text: str) -> FinancialData:
 
     top_expenses = sorted(top_expenses, key=lambda x: x[1], reverse=True)[:5]
 
+    # Extract balance sheet data
+    balance_sheet = extract_balance_sheet(text)
+    
+    # Extract weekly offerings
+    weekly_offerings = extract_weekly_offerings(text)
+    
+    # Extract budget detail
+    budget_detail = extract_budget_detail(text)
+
     return FinancialData(
         giving_monthly=giving_monthly,
         giving_ytd=giving_ytd,
@@ -200,6 +423,9 @@ def extract_financial_data(text: str) -> FinancialData:
         actual_ytd=actual_ytd,
         variance_ytd=variance_ytd,
         top_expenses=top_expenses,
+        balance_sheet=balance_sheet,
+        weekly_offerings=weekly_offerings,
+        budget_detail=budget_detail,
     )
 
 
@@ -346,6 +572,33 @@ def build_dashboard_payload(packets: list[PacketSummary]) -> dict[str, Any]:
                     "actual_ytd": p.financial_data.actual_ytd,
                     "variance_ytd": p.financial_data.variance_ytd,
                     "top_expenses": p.financial_data.top_expenses,
+                    "balance_sheet": {
+                        "total_assets": p.financial_data.balance_sheet.total_assets if p.financial_data.balance_sheet else None,
+                        "current_assets": p.financial_data.balance_sheet.current_assets if p.financial_data.balance_sheet else None,
+                        "fixed_assets": p.financial_data.balance_sheet.fixed_assets if p.financial_data.balance_sheet else None,
+                        "total_liabilities": p.financial_data.balance_sheet.total_liabilities if p.financial_data.balance_sheet else None,
+                        "current_liabilities": p.financial_data.balance_sheet.current_liabilities if p.financial_data.balance_sheet else None,
+                        "long_term_debt": p.financial_data.balance_sheet.long_term_debt if p.financial_data.balance_sheet else None,
+                        "total_equity": p.financial_data.balance_sheet.total_equity if p.financial_data.balance_sheet else None,
+                        "unrestricted_funds": p.financial_data.balance_sheet.unrestricted_funds if p.financial_data.balance_sheet else None,
+                        "restricted_funds": p.financial_data.balance_sheet.restricted_funds if p.financial_data.balance_sheet else None,
+                    } if p.financial_data.balance_sheet else None,
+                    "weekly_offerings": [
+                        {
+                            "week_num": w.week_num,
+                            "offering_amount": w.offering_amount,
+                            "budget_amount": w.budget_amount,
+                            "percent_of_budget": w.percent_of_budget,
+                        }
+                        for w in p.financial_data.weekly_offerings
+                    ],
+                    "budget_detail": {
+                        "ytd_budget": p.financial_data.budget_detail.ytd_budget if p.financial_data.budget_detail else None,
+                        "ytd_actual": p.financial_data.budget_detail.ytd_actual if p.financial_data.budget_detail else None,
+                        "ytd_variance": p.financial_data.budget_detail.ytd_variance if p.financial_data.budget_detail else None,
+                        "percent_spent": p.financial_data.budget_detail.percent_spent if p.financial_data.budget_detail else None,
+                        "line_items": p.financial_data.budget_detail.line_items if p.financial_data.budget_detail else [],
+                    } if p.financial_data.budget_detail else None,
                 },
             }
             for p in packets_sorted
