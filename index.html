@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Good Shepherd Church | Executive Financial Health Dashboard</title>
+    <title>Good Shepherd Church | Stewardship Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.min.js"></script>
 </head>
@@ -12,96 +12,118 @@
         <header class="hero">
             <div>
                 <h1>Good Shepherd Church</h1>
-                <p class="subtitle">Executive Financial Health Dashboard</p>
+                <p class="subtitle">Comprehensive Stewardship & Financial Health Dashboard</p>
             </div>
             <div class="hero-meta">
                 <div><span class="label">Generated</span><strong id="generatedAt">—</strong></div>
-                <div><span class="label">Packets</span><strong id="packetCount">—</strong></div>
-                <div><span class="label">Total Pages</span><strong id="pageCount">—</strong></div>
+                <div><span class="label">Board Packets</span><strong id="packetCount">—</strong></div>
+                <div><span class="label">Data Coverage</span><strong id="coveragePct">—</strong></div>
             </div>
         </header>
 
         <main class="main">
             <section class="section">
-                <h2>Executive Overview</h2>
-                <div class="kpi-grid">
+                <h2>Top Row: Pulse</h2>
+                <div class="kpi-grid pulse-grid">
                     <article class="kpi-card">
-                        <span class="kpi-label">YTD Giving</span>
-                        <strong id="kpiGiving" class="kpi-value">—</strong>
+                        <span class="kpi-label">Total Giving (YTD)</span>
+                        <strong id="pulseGiving" class="kpi-value">—</strong>
+                        <span class="kpi-note">Monthly totals not consistently extracted</span>
                     </article>
                     <article class="kpi-card">
-                        <span class="kpi-label">YTD Budget</span>
-                        <strong id="kpiBudget" class="kpi-value">—</strong>
+                        <span class="kpi-label">Variance vs Budget (YTD)</span>
+                        <strong id="pulseVariance" class="kpi-value">—</strong>
+                        <span class="kpi-note" id="pulseVarianceNote">—</span>
                     </article>
                     <article class="kpi-card">
-                        <span class="kpi-label">YTD Actual</span>
-                        <strong id="kpiActual" class="kpi-value">—</strong>
+                        <span class="kpi-label">Estimated Cash Balance</span>
+                        <strong id="pulseCash" class="kpi-value">—</strong>
+                        <span class="kpi-note">From latest available balance sheet fields</span>
                     </article>
                     <article class="kpi-card">
-                        <span class="kpi-label">YTD Variance</span>
-                        <strong id="kpiVariance" class="kpi-value">—</strong>
-                    </article>
-                    <article class="kpi-card">
-                        <span class="kpi-label">Actual / Budget</span>
-                        <strong id="kpiBudgetAttainment" class="kpi-value">—</strong>
-                    </article>
-                    <article class="kpi-card">
-                        <span class="kpi-label">Data Completeness</span>
-                        <strong id="kpiCompleteness" class="kpi-value">—</strong>
+                        <span class="kpi-label">Days Cash on Hand</span>
+                        <strong id="pulseDaysCash" class="kpi-value">—</strong>
+                        <span class="kpi-note">Target: 60–90 days</span>
                     </article>
                 </div>
             </section>
 
             <section class="section charts-grid">
                 <article class="card">
-                    <h3>Budget vs Actual Trend (YTD)</h3>
-                    <canvas id="budgetActualTrend"></canvas>
+                    <h3>Middle Panel: 12-Month Giving vs Expense Trend</h3>
+                    <canvas id="trendChart"></canvas>
                 </article>
                 <article class="card">
-                    <h3>Top Expense Categories</h3>
-                    <canvas id="expenseBreakdown"></canvas>
+                    <h3>Attendance & Engagement Context</h3>
+                    <canvas id="engagementChart"></canvas>
+                    <p class="muted">Attendance and volunteer counts are not present in current packet extraction; chart reflects available giving signals only.</p>
                 </article>
             </section>
 
             <section class="section charts-grid">
                 <article class="card">
-                    <h3>Monthly Giving % of Budget</h3>
-                    <canvas id="givingMonthly"></canvas>
+                    <h3>Bottom Panel: Budget Breakdown</h3>
+                    <canvas id="budgetBreakdownChart"></canvas>
                 </article>
                 <article class="card">
-                    <h3>Coverage by Packet</h3>
-                    <canvas id="coverageChart"></canvas>
+                    <h3>Bottom Panel: Giving Channel Mix</h3>
+                    <canvas id="givingChannelChart"></canvas>
+                    <p class="muted">Channel split is shown only when packet text includes online/mail vs in-person values.</p>
                 </article>
             </section>
 
             <section class="section two-col">
                 <article class="card">
-                    <h3>March 31, 2025 Strategic Facts</h3>
-                    <table class="data-table" id="marchFactsTable">
+                    <h3>A. Offerings & Giving Trends KPIs</h3>
+                    <table class="data-table" id="givingKpiTable">
                         <thead>
-                            <tr><th>Area</th><th>Metric</th><th>Value</th></tr>
+                            <tr><th>KPI</th><th>Current</th><th>Target</th><th>Status</th><th>Insight</th></tr>
                         </thead>
                         <tbody></tbody>
                     </table>
                 </article>
+
                 <article class="card">
-                    <h3>Strategic Risk Flags</h3>
-                    <ul id="riskFlags" class="flag-list"></ul>
+                    <h3>B. Financial Health KPIs</h3>
+                    <table class="data-table" id="healthKpiTable">
+                        <thead>
+                            <tr><th>KPI</th><th>Current</th><th>Target</th><th>Status</th><th>Insight</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </article>
+            </section>
+
+            <section class="section two-col">
+                <article class="card">
+                    <h3>C. Attendance & Engagement KPIs</h3>
+                    <table class="data-table" id="engagementKpiTable">
+                        <thead>
+                            <tr><th>KPI</th><th>Current</th><th>Target</th><th>Status</th><th>Insight</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </article>
+
+                <article class="card">
+                    <h3>Executive Story & Seasonal Interpretation</h3>
+                    <ul id="storyList" class="story-list"></ul>
                 </article>
             </section>
 
             <section class="section">
                 <article class="card">
-                    <h3>Packet Data Quality Matrix</h3>
+                    <h3>Packet-Level Data Reliability Matrix</h3>
                     <table class="data-table" id="qualityTable">
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Packet</th>
+                                <th>Title</th>
                                 <th>Budget/Actual</th>
                                 <th>Giving Monthly</th>
                                 <th>Balance Sheet</th>
                                 <th>Weekly Offering</th>
+                                <th>Coverage (0–4)</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -111,28 +133,18 @@
 
             <section class="section">
                 <article class="card">
-                    <h3>All Board Packets</h3>
-                    <table class="data-table" id="packetsTable">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Title</th>
-                                <th>Pages</th>
-                                <th>Currency Mentions</th>
-                                <th>Finance Score</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                    <h3>Master Analyst AI Prompt (Board-Ready)</h3>
+                    <pre id="aiPromptBlock" class="prompt-block"></pre>
                 </article>
             </section>
         </main>
 
         <footer class="footer">
-            <p>Executive reporting model rebuilt from extracted board packet data.</p>
-            <p id="footerNote">Values marked N/A indicate missing source extraction, not zero.</p>
+            <p>Stewardship principle: Values marked N/A represent missing source data, not zero activity.</p>
+            <p id="footerNote">—</p>
         </footer>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>
