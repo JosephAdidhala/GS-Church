@@ -107,6 +107,16 @@ h1 {
   gap: 1rem;
 }
 
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
 .card {
   background: var(--card);
   border: 1px solid var(--line);
@@ -121,8 +131,15 @@ h1 {
 }
 
 canvas {
-  width: 100%;
-  min-height: 290px;
+  width: 100% !important;
+  height: 320px !important;
+  max-height: 320px;
+}
+
+.chart-container {
+  position: relative;
+  height: 340px;
+  margin-bottom: 1rem;
 }
 
 .kpi p {

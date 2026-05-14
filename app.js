@@ -17,8 +17,14 @@ const el = {
   kpiVariance: document.getElementById('kpi-variance'),
   kpiTotalGiving: document.getElementById('kpi-total-giving'),
   kpiMonthlyAvg: document.getElementById('kpi-monthly-avg'),
+  kpiGivingPerf: document.getElementById('kpi-giving-perf'),
+  reportGiving: document.getElementById('report-giving'),
+  reportBudget: document.getElementById('report-budget'),
+  reportActual: document.getElementById('report-actual'),
+  reportVariance: document.getElementById('report-variance'),
+  reportVarianceStatus: document.getElementById('report-variance-status'),
+  givingReportTable: document.getElementById('giving-report-table'),
   tableBody: document.getElementById('packet-table-body'),
-  detail: document.getElementById('packet-detail'),
   budgetDetail: document.getElementById('budget-detail'),
   filterInput: document.getElementById('filter-input'),
   refreshBtn: document.getElementById('refresh-btn'),
@@ -48,7 +54,7 @@ function setKpis(summary, financial) {
   el.kpiGiving.textContent = moneyFmt.format(financial.total_giving_ytd || 0);
   el.kpiBudget.textContent = moneyFmt.format(financial.total_budget_ytd || 0);
   el.kpiActual.textContent = moneyFmt.format(financial.total_actual_ytd || 0);
-  el.kpiVariance.textContent = numberFmt.format(financial.average_variance_ytd || 0) + '%';
+  el.kpiVariance.textContent = numberFmt.format(Math.abs(financial.average_variance_ytd || 0)) + '%';
   el.kpiTotalGiving.textContent = moneyFmt.format(financial.total_giving_ytd || 0);
   
   const monthCount = Object.keys(financial.giving_monthly_averages || {}).length;
@@ -56,6 +62,22 @@ function setKpis(summary, financial) {
     ? Object.values(financial.giving_monthly_averages || {}).reduce((a, b) => a + b, 0) / monthCount 
     : 0;
   el.kpiMonthlyAvg.textContent = numberFmt.format(Math.round(avgMonthly)) + '%';
+  
+  const givingPerf = financial.total_giving_ytd >= financial.total_budget_ytd ? 'Above' : 'Below';
+  el.kpiGivingPerf.textContent = givingPerf + ' Budget';
+
+  // Report table
+  el.reportGiving.textContent = moneyFmt.format(financial.total_giving_ytd || 0);
+  el.reportBudget.textContent = moneyFmt.format(financial.total_budget_ytd || 0);
+  el.reportActual.textContent = moneyFmt.format(financial.total_actual_ytd || 0);
+  
+  const variance = (financial.total_actual_ytd || 0) - (financial.total_budget_ytd || 0);
+  const varColor = variance > 0 ? '#ef4444' : '#10b981';
+  const varStatus = variance > 0 ? 'Over' : 'Under';
+  el.reportVariance.textContent = moneyFmt.format(Math.abs(variance));
+  el.reportVariance.style.color = varColor;
+  el.reportVarianceStatus.textContent = varStatus;
+  el.reportVarianceStatus.style.color = varColor;
 }
 
 function destroyCharts() {
@@ -345,6 +367,7 @@ async function loadDashboard() {
   createGivingMonthlyChart(state.data.giving_monthly_averages || {});
 
   renderBudgetDetail();
+  renderGivingReport();
   applyFilter();
 }
 
@@ -352,7 +375,7 @@ function renderBudgetDetail() {
   if (!el.budgetDetail || !state.data) return;
 
   const fin = state.data.financial_summary || {};
-  const variance = fin.average_variance_ytd || 0;
+  const variance = (fin.total_actual_ytd || 0) - (fin.total_budget_ytd || 0);
   const status = variance > 0 ? 'Over Budget' : 'Under Budget';
   const color = variance > 0 ? '#ef4444' : '#10b981';
 
@@ -361,13 +384,40 @@ function renderBudgetDetail() {
       <div>
         <p><strong>Budget YTD:</strong> ${moneyFmt.format(fin.total_budget_ytd || 0)}</p>
         <p><strong>Actual YTD:</strong> ${moneyFmt.format(fin.total_actual_ytd || 0)}</p>
-        <p><strong>Variance:</strong> <span style="color: ${color}; font-weight: bold;">${moneyFmt.format(fin.total_actual_ytd - fin.total_budget_ytd || 0)} (${status})</span></p>
+        <p><strong>Variance:</strong> <span style="color: ${color}; font-weight: bold;">${moneyFmt.format(Math.abs(variance))} (${status})</span></p>
       </div>
       <div>
-        <p><strong>Average Variance %:</strong> ${numberFmt.format(Math.abs(variance))}%</p>
+        <p><strong>Average Variance %:</strong> ${numberFmt.format(Math.abs(fin.average_variance_ytd || 0))}%</p>
       </div>
     </div>
   `;
+}
+
+function renderGivingReport() {
+  if (!el.givingReportTable || !state.data) return;
+
+  const giving = state.data.giving_monthly_averages || {};
+  const months = Object.keys(giving).sort();
+
+  if (months.length === 0) {
+    el.givingReportTable.innerHTML = '<tr><td colspan="3" style="padding: 0.8rem; text-align: center; color: var(--muted);">No monthly data</td></tr>';
+    return;
+  }
+
+  const rows = months.map((month) => {
+    const pct = giving[month];
+    const status = pct >= 100 ? '✓' : '—';
+    const color = pct >= 100 ? '#10b981' : '#f59e0b';
+    return `
+      <tr style="border-bottom: 1px solid var(--line);">
+        <td style="padding: 0.8rem;">${month}</td>
+        <td style="text-align: right; padding: 0.8rem; font-weight: bold;">${numberFmt.format(Math.round(pct))}%</td>
+        <td style="text-align: center; padding: 0.8rem; color: ${color}; font-weight: bold;">${status}</td>
+      </tr>
+    `;
+  }).join('');
+
+  el.givingReportTable.innerHTML = rows;
 }
 
 function attachEvents() {

@@ -38,24 +38,18 @@
         <section class="grid-2">
           <article class="card">
             <h2>Finance Signal Trend</h2>
-            <canvas id="trend-chart"></canvas>
+            <div class="chart-container"><canvas id="trend-chart"></canvas></div>
           </article>
           <article class="card">
             <h2>Top Finance Keywords</h2>
-            <canvas id="keyword-chart"></canvas>
+            <div class="chart-container"><canvas id="keyword-chart"></canvas></div>
           </article>
         </section>
 
-        <section class="grid-2">
-          <article class="card">
-            <h2>Packet Size vs Money Mentions</h2>
-            <canvas id="scatter-chart"></canvas>
-          </article>
-          <article class="card details" id="packet-detail">
-            <h2>Packet Detail</h2>
-            <p>Select a row below to inspect a packet.</p>
-          </article>
-        </section>
+        <article class="card full-width">
+          <h2>Packet Analysis</h2>
+          <div class="chart-container"><canvas id="scatter-chart"></canvas></div>
+        </article>
       </section>
 
       <!-- Financial Tracking Tab -->
@@ -64,17 +58,48 @@
           <article class="card kpi"><h2>YTD Giving</h2><p id="kpi-giving">-</p></article>
           <article class="card kpi"><h2>YTD Budget</h2><p id="kpi-budget">-</p></article>
           <article class="card kpi"><h2>YTD Actual Spend</h2><p id="kpi-actual">-</p></article>
-          <article class="card kpi"><h2>Avg Variance %</h2><p id="kpi-variance">-</p></article>
+          <article class="card kpi"><h2>Variance</h2><p id="kpi-variance">-</p></article>
         </section>
+
+        <article class="card full-width">
+          <h2>Financial Summary Report</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr style="border-bottom: 2px solid var(--line);">
+              <th style="text-align: left; padding: 0.8rem;">Metric</th>
+              <th style="text-align: right; padding: 0.8rem;">Amount</th>
+              <th style="text-align: right; padding: 0.8rem;">Status</th>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--line);">
+              <td style="padding: 0.8rem;"><strong>YTD Giving</strong></td>
+              <td style="text-align: right; padding: 0.8rem;" id="report-giving">-</td>
+              <td style="text-align: right; padding: 0.8rem; color: #10b981;">✓</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--line);">
+              <td style="padding: 0.8rem;"><strong>YTD Budget</strong></td>
+              <td style="text-align: right; padding: 0.8rem;" id="report-budget">-</td>
+              <td style="text-align: right; padding: 0.8rem;">—</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--line);">
+              <td style="padding: 0.8rem;"><strong>YTD Actual Spend</strong></td>
+              <td style="text-align: right; padding: 0.8rem;" id="report-actual">-</td>
+              <td style="text-align: right; padding: 0.8rem;">—</td>
+            </tr>
+            <tr style="background: #f0f4f8; border-bottom: 2px solid var(--line);">
+              <td style="padding: 0.8rem;"><strong>Budget Variance</strong></td>
+              <td style="text-align: right; padding: 0.8rem; font-weight: bold;" id="report-variance">-</td>
+              <td style="text-align: right; padding: 0.8rem;" id="report-variance-status">—</td>
+            </tr>
+          </table>
+        </article>
 
         <section class="grid-2">
           <article class="card">
             <h2>Budget vs Actual Trend</h2>
-            <canvas id="budget-trend-chart"></canvas>
+            <div class="chart-container"><canvas id="budget-trend-chart"></canvas></div>
           </article>
           <article class="card">
             <h2>Top Expense Categories</h2>
-            <canvas id="expense-chart"></canvas>
+            <div class="chart-container"><canvas id="expense-chart"></canvas></div>
           </article>
         </section>
       </section>
@@ -84,11 +109,26 @@
         <section class="kpi-grid">
           <article class="card kpi"><h2>Total YTD Giving</h2><p id="kpi-total-giving">-</p></article>
           <article class="card kpi"><h2>Avg Monthly Giving %</h2><p id="kpi-monthly-avg">-</p></article>
+          <article class="card kpi"><h2>Giving Performance</h2><p id="kpi-giving-perf">-</p></article>
         </section>
 
-        <article class="card">
+        <article class="card full-width">
+          <h2>Monthly Giving Performance Report</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr style="border-bottom: 2px solid var(--line);">
+              <th style="text-align: left; padding: 0.8rem;">Month</th>
+              <th style="text-align: right; padding: 0.8rem;">% of Budget</th>
+              <th style="text-align: center; padding: 0.8rem;">Status</th>
+            </tr>
+            <tbody id="giving-report-table">
+              <tr style="border-bottom: 1px solid var(--line);"><td colspan="3" style="padding: 0.8rem; text-align: center; color: var(--muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </article>
+
+        <article class="card full-width">
           <h2>Monthly Giving vs Budget %</h2>
-          <canvas id="giving-monthly-chart"></canvas>
+          <div class="chart-container"><canvas id="giving-monthly-chart"></canvas></div>
         </article>
       </section>
 
