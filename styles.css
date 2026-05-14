@@ -222,6 +222,21 @@ canvas {
     padding: 12px;
 }
 
+.upload-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+#metricsCsvInput {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px;
+    background: #fff;
+}
+
 .flag-list {
     margin: 0;
     padding-left: 18px;
