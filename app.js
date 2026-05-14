@@ -203,6 +203,40 @@ function renderStory() {
     byId('aiPromptBlock').textContent = AI_PROMPT;
 }
 
+function renderTrendTable(data) {
+    const rows = (data.trend || []).slice();
+    const body = byId('trendTableBody');
+    if (!body) return;
+
+    rows.sort((a, b) => String(a.meeting_date || '').localeCompare(String(b.meeting_date || '')));
+    body.innerHTML = rows.map(r => `
+        <tr>
+            <td>${r.display_date || r.meeting_date || 'N/A'}</td>
+            <td>${money(num(r.giving_ytd))}</td>
+            <td>${money(num(r.budget_ytd))}</td>
+            <td>${money(num(r.actual_ytd))}</td>
+            <td>${isNum(num(r.finance_score)) ? num(r.finance_score) : 'N/A'}</td>
+            <td>${isNum(num(r.currency_mentions)) ? num(r.currency_mentions) : 'N/A'}</td>
+        </tr>
+    `).join('');
+
+    const first = rows[0];
+    const last = rows[rows.length - 1];
+    const scoreDelta = isNum(num(first?.finance_score)) && isNum(num(last?.finance_score))
+        ? num(last.finance_score) - num(first.finance_score)
+        : null;
+    const mentionDelta = isNum(num(first?.currency_mentions)) && isNum(num(last?.currency_mentions))
+        ? num(last.currency_mentions) - num(first.currency_mentions)
+        : null;
+
+    const summary = byId('trendSummary');
+    if (summary) {
+        const scoreText = isNum(scoreDelta) ? `${scoreDelta >= 0 ? 'up' : 'down'} ${Math.abs(scoreDelta)} finance-score points` : 'finance-score trend unavailable';
+        const mentionText = isNum(mentionDelta) ? `${mentionDelta >= 0 ? 'up' : 'down'} ${Math.abs(mentionDelta)} currency mentions` : 'currency-mention trend unavailable';
+        summary.textContent = `Packet trend: ${scoreText}, ${mentionText}.`;
+    }
+}
+
 function renderRawData(data) {
     const el = byId('rawDataBlock');
     if (!el) return;
@@ -222,23 +256,47 @@ function renderCharts(data) {
         let labels = [];
         let givingSeries = [];
         let expenseSeries = [];
+        let scoreSeries = [];
+        let mentionSeries = [];
         if (csvRows.length) {
             labels = csvRows.map(r => r.month || 'Month');
             givingSeries = csvRows.map(r => num(r.total_giving));
             expenseSeries = csvRows.map(r => num(r.operating_expense));
+            scoreSeries = [];
+            mentionSeries = [];
         } else {
-            const rows = (data.trend || []).filter(t => isNum(t.giving_ytd) || isNum(t.actual_ytd));
-            labels = rows.map((t, i) => t.display_date || `P${i + 1}`);
+            const rows = (data.trend || []).slice().sort((a, b) => String(a.meeting_date || '').localeCompare(String(b.meeting_date || '')));
+            labels = rows.map((t, i) => t.display_date || t.meeting_date || `P${i + 1}`);
             givingSeries = rows.map(t => num(t.giving_ytd));
             expenseSeries = rows.map(t => num(t.actual_ytd));
+            scoreSeries = rows.map(t => num(t.finance_score));
+            mentionSeries = rows.map(t => num(t.currency_mentions));
         }
+
+        const datasets = [
+            { label: 'Giving', data: givingSeries, borderColor: '#2563eb', tension: 0.25, yAxisID: 'y' },
+            { label: 'Expenses', data: expenseSeries, borderColor: '#dc2626', tension: 0.25, yAxisID: 'y' }
+        ];
+
+        if (!csvRows.length) {
+            datasets.push(
+                { label: 'Finance Score', data: scoreSeries, borderColor: '#16a34a', tension: 0.25, yAxisID: 'y1' },
+                { label: 'Currency Mentions', data: mentionSeries, borderColor: '#a855f7', tension: 0.25, yAxisID: 'y1' }
+            );
+        }
+
         charts.trend = new Chart(trendCtx, {
             type: 'line',
-            data: { labels, datasets: [
-                { label: 'Giving', data: givingSeries, borderColor: '#2563eb', tension: 0.25 },
-                { label: 'Expenses', data: expenseSeries, borderColor: '#dc2626', tension: 0.25 }
-            ] },
-            options: { responsive: true, maintainAspectRatio: false, spanGaps: true }
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                spanGaps: true,
+                scales: {
+                    y: { beginAtZero: true, position: 'left' },
+                    y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } }
+                }
+            }
         });
     }
 
@@ -301,6 +359,7 @@ function rerender() {
     try { renderQualityTable(baseData); } catch (e) { console.error('renderQualityTable failed', e); }
     try { renderStory(); } catch (e) { console.error('renderStory failed', e); }
     try { renderCharts(baseData); } catch (e) { console.error('renderCharts failed', e); }
+    try { renderTrendTable(baseData); } catch (e) { console.error('renderTrendTable failed', e); }
     try { renderRawData(baseData); } catch (e) { console.error('renderRawData failed', e); }
     byId('footerNote').textContent = csvRows.length ? 'Dashboard loaded with supplemental CSV metrics.' : 'Dashboard loaded successfully.';
 }
