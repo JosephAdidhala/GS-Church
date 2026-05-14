@@ -203,6 +203,16 @@ function renderStory() {
     byId('aiPromptBlock').textContent = AI_PROMPT;
 }
 
+function renderRawData(data) {
+    const el = byId('rawDataBlock');
+    if (!el) return;
+    try {
+        el.textContent = JSON.stringify(data, null, 2);
+    } catch {
+        el.textContent = 'Unable to display raw data.';
+    }
+}
+
 function renderCharts(data) {
     if (typeof Chart === 'undefined') return;
 
@@ -286,11 +296,12 @@ function renderCharts(data) {
 
 function rerender() {
     if (!baseData) return;
-    renderPulse(baseData);
-    renderKpiTables(baseData);
-    renderQualityTable(baseData);
-    renderStory();
-    renderCharts(baseData);
+    try { renderPulse(baseData); } catch (e) { console.error('renderPulse failed', e); }
+    try { renderKpiTables(baseData); } catch (e) { console.error('renderKpiTables failed', e); }
+    try { renderQualityTable(baseData); } catch (e) { console.error('renderQualityTable failed', e); }
+    try { renderStory(); } catch (e) { console.error('renderStory failed', e); }
+    try { renderCharts(baseData); } catch (e) { console.error('renderCharts failed', e); }
+    try { renderRawData(baseData); } catch (e) { console.error('renderRawData failed', e); }
     byId('footerNote').textContent = csvRows.length ? 'Dashboard loaded with supplemental CSV metrics.' : 'Dashboard loaded successfully.';
 }
 
