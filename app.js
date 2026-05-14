@@ -200,7 +200,6 @@ function renderStory() {
         '<li>For board decisions, focus on recurring share, burn rate direction, and cash runway.</li>',
         `<li>${csvRows.length ? `CSV-enhanced metrics are active (${csvRows.length} rows loaded).` : 'Upload CSV to unlock currently unavailable donor and attendance KPIs.'}</li>`
     ].join('');
-    byId('aiPromptBlock').textContent = AI_PROMPT;
 }
 
 function renderTrendTable(data) {
@@ -262,8 +261,8 @@ function renderCharts(data) {
             labels = csvRows.map(r => r.month || 'Month');
             givingSeries = csvRows.map(r => num(r.total_giving));
             expenseSeries = csvRows.map(r => num(r.operating_expense));
-            scoreSeries = [];
-            mentionSeries = [];
+            scoreSeries = csvRows.map(() => null);
+            mentionSeries = csvRows.map(() => null);
         } else {
             const rows = (data.trend || []).slice().sort((a, b) => String(a.meeting_date || '').localeCompare(String(b.meeting_date || '')));
             labels = rows.map((t, i) => t.display_date || t.meeting_date || `P${i + 1}`);
@@ -273,17 +272,17 @@ function renderCharts(data) {
             mentionSeries = rows.map(t => num(t.currency_mentions));
         }
 
-        const datasets = [
-            { label: 'Giving', data: givingSeries, borderColor: '#2563eb', tension: 0.25, yAxisID: 'y' },
-            { label: 'Expenses', data: expenseSeries, borderColor: '#dc2626', tension: 0.25, yAxisID: 'y' }
-        ];
-
-        if (!csvRows.length) {
-            datasets.push(
-                { label: 'Finance Score', data: scoreSeries, borderColor: '#16a34a', tension: 0.25, yAxisID: 'y1' },
-                { label: 'Currency Mentions', data: mentionSeries, borderColor: '#a855f7', tension: 0.25, yAxisID: 'y1' }
-            );
-        }
+        const datasets = !csvRows.length
+            ? [
+                { label: 'Finance Score', data: scoreSeries, borderColor: '#16a34a', tension: 0.25, yAxisID: 'y' },
+                { label: 'Currency Mentions', data: mentionSeries, borderColor: '#a855f7', tension: 0.25, yAxisID: 'y1' },
+                { label: 'Giving YTD', data: givingSeries, borderColor: '#2563eb', tension: 0.25, borderDash: [6, 4], yAxisID: 'y2' },
+                { label: 'Actual YTD', data: expenseSeries, borderColor: '#dc2626', tension: 0.25, borderDash: [6, 4], yAxisID: 'y2' }
+            ]
+            : [
+                { label: 'Giving', data: givingSeries, borderColor: '#2563eb', tension: 0.25, yAxisID: 'y' },
+                { label: 'Expenses', data: expenseSeries, borderColor: '#dc2626', tension: 0.25, yAxisID: 'y' }
+            ];
 
         charts.trend = new Chart(trendCtx, {
             type: 'line',
@@ -294,7 +293,8 @@ function renderCharts(data) {
                 spanGaps: true,
                 scales: {
                     y: { beginAtZero: true, position: 'left' },
-                    y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } }
+                    y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false } },
+                    y2: { beginAtZero: true, position: 'right', display: false, grid: { drawOnChartArea: false } }
                 }
             }
         });
@@ -360,7 +360,6 @@ function rerender() {
     try { renderStory(); } catch (e) { console.error('renderStory failed', e); }
     try { renderCharts(baseData); } catch (e) { console.error('renderCharts failed', e); }
     try { renderTrendTable(baseData); } catch (e) { console.error('renderTrendTable failed', e); }
-    try { renderRawData(baseData); } catch (e) { console.error('renderRawData failed', e); }
     byId('footerNote').textContent = csvRows.length ? 'Dashboard loaded with supplemental CSV metrics.' : 'Dashboard loaded successfully.';
 }
 
