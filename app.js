@@ -1,305 +1,205 @@
-// Church Financial Dashboard - Simplified App.js
-console.log('✓ App.js started loading');
-
-const FORMAT = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-});
-
-let dashboardData = null;
+// SIMPLE WORKING DASHBOARD
+let data = null;
 let charts = {};
+const fmt = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+const MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-// Simple format number
-function formatMoney(num) {
-    return FORMAT.format(num || 0);
-}
+const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
+const moneyOrNA = (v) => isNum(v) ? fmt(v) : 'N/A';
+const textOrNA = (v) => (v === null || v === undefined || v === '') ? 'N/A' : String(v);
 
-// Load Dashboard
+// Load and render dashboard
 async function loadDashboard() {
-    console.log('Loading dashboard...');
     try {
-        const response = await fetch('data/board_packets_data.json');
-        console.log('Fetch response:', response.status);
-        
-        if (!response.ok) {
-            throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
-        }
-        
-        dashboardData = await response.json();
-        console.log('✓ Data loaded:', dashboardData);
-
-        // Update data date
-        if (dashboardData.generated_at) {
-            const date = new Date(dashboardData.generated_at);
-            const dateEl = document.getElementById('dataDate');
-            if (dateEl) dateEl.textContent = date.toLocaleDateString();
-        }
-
-        // Populate KPIs
-        populateKpis();
-        console.log('✓ KPIs populated');
-
-        // Render Charts
-        setTimeout(() => {
-            renderCharts();
-            console.log('✓ Charts rendered');
-        }, 100);
-
-        // Populate Tables
-        setTimeout(() => {
-            populateTables();
-            console.log('✓ Tables populated');
-        }, 200);
-
-        // Attach Events
-        attachTabEvents();
-        console.log('✓ Events attached');
-
-    } catch (error) {
-        console.error('❌ Error loading dashboard:', error);
-        showError(error.message);
+        const r = await fetch('data/board_packets_data.json');
+        if (!r.ok) throw new Error(`Failed to load data (${r.status})`);
+        data = await r.json();
+        render();
+    } catch(e) {
+        console.error('Error:', e);
+        alert('Error loading data: ' + e.message);
     }
 }
 
-function showError(message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.style.cssText = 'position: fixed; top: 20px; left: 20px; background: #ef4444; color: white; padding: 20px; border-radius: 8px; z-index: 10000; font-family: monospace; font-size: 12px;';
-    errorDiv.textContent = '❌ ' + message;
-    document.body.appendChild(errorDiv);
+function render() {
+    if (!data || !data.financial_summary) return;
+    
+    const s = data.financial_summary;
+    const pkts = data.packets || [];
+    
+    // KPI Cards - Overview
+    setMoney('kpi-giving', s.total_giving_ytd);
+    setMoney('kpi-budget', s.total_budget_ytd);
+    setMoney('kpi-actual', s.total_actual_ytd);
+    setMoney('kpi-variance', s.average_variance_ytd);
+    
+    // Budget vs Actual
+    setMoney('bva-budget', s.total_budget_ytd);
+    setMoney('bva-actual', s.total_actual_ytd);
+    setMoney('bva-variance', isNum(s.average_variance_ytd) ? Math.abs(s.average_variance_ytd) : null);
+    setPercent('bva-spent', s.total_actual_ytd, s.total_budget_ytd, 1);
+    
+    // Financial Tracking
+    setMoney('ft-giving', s.total_giving_ytd);
+    setMoney('ft-budget', s.total_budget_ytd);
+    setMoney('ft-actual', s.total_actual_ytd);
+    setMoney('ft-variance', s.average_variance_ytd);
+    
+    // Giving
+    setMoney('gd-ytd', s.total_giving_ytd);
+    setMoney('gd-monthly', isNum(s.total_giving_ytd) ? (s.total_giving_ytd / 12) : null);
+    setPercent('gd-pct', s.total_giving_ytd, s.total_budget_ytd, 0);
+    
+    // Recent packets
+    const t1 = el('recentPacketsTable')?.querySelector('tbody');
+    if (t1) {
+        t1.innerHTML = pkts.slice(-5).map(p =>
+            `<tr><td>${textOrNA(p.display_date)}</td><td>${textOrNA(p.title)}</td><td>${textOrNA(p.page_count)}</td><td>${textOrNA(p.currency_mentions)}</td><td>${textOrNA(p.finance_score)}</td></tr>`
+        ).join('');
+    }
+    
+    // All packets
+    const t2 = el('packetsTable')?.querySelector('tbody');
+    if (t2) {
+        t2.innerHTML = pkts.map(p =>
+            `<tr><td>${textOrNA(p.display_date)}</td><td>${textOrNA(p.title)}</td><td>${textOrNA(p.page_count)}</td><td>${textOrNA(p.currency_mentions)}</td><td>${textOrNA(p.finance_score)}</td></tr>`
+        ).join('');
+    }
+    
+    // Budget summary
+    const t3 = el('budgetSummaryTable')?.querySelector('tbody');
+    if (t3) {
+        const budget = isNum(s.total_budget_ytd) ? s.total_budget_ytd : null;
+        const actual = isNum(s.total_actual_ytd) ? s.total_actual_ytd : null;
+        const variance = (isNum(actual) && isNum(budget)) ? (actual - budget) : null;
+        t3.innerHTML = `<tr><td>Total</td><td class="amount">${moneyOrNA(budget)}</td><td class="amount">${moneyOrNA(actual)}</td><td class="amount">${moneyOrNA(variance)}</td><td>${isNum(variance) ? (variance >= 0 ? 'Over' : 'Under') : 'N/A'}</td></tr>`;
+    }
+    
+    // Giving report
+    const giving = data.giving_monthly_averages || {};
+    const t4 = el('givingReportBody');
+    if (t4) {
+        t4.innerHTML = MONTHS_SHORT.map((m, i) => {
+            const pct = giving[MONTHS_FULL[i]];
+            return `<tr><td>${m}</td><td>${isNum(pct) ? `${pct.toFixed(1)}%` : 'N/A'}</td><td>${isNum(pct) ? (pct >= 100 ? '✓' : '−') : 'N/A'}</td></tr>`;
+        }).join('');
+    }
+    
+    // Charts
+    setTimeout(renderCharts, 50);
 }
 
-// Populate KPIs
-function populateKpis() {
-    if (!dashboardData || !dashboardData.financial_summary) {
-        console.warn('No financial summary data');
+function setMoney(id, val) {
+    const e = el(id);
+    if (e) e.textContent = moneyOrNA(val);
+}
+
+function setPercent(id, numerator, denominator, decimals = 1) {
+    const e = el(id);
+    if (!e) return;
+    if (!isNum(numerator) || !isNum(denominator) || denominator <= 0) {
+        e.textContent = 'N/A';
         return;
     }
-
-    const summary = dashboardData.financial_summary;
-
-    // Helper to set KPI
-    const setKpi = (id, value) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = formatMoney(value || 0);
-    };
-
-    // Overview tab
-    setKpi('kpi-giving', summary.total_giving_ytd);
-    setKpi('kpi-budget', summary.total_budget_ytd);
-    setKpi('kpi-actual', summary.total_actual_ytd);
-    setKpi('kpi-variance', summary.average_variance_ytd);
-
-    // Budget vs Actual
-    setKpi('bva-budget', summary.total_budget_ytd);
-    setKpi('bva-actual', summary.total_actual_ytd);
-    setKpi('bva-variance', Math.abs(summary.average_variance_ytd || 0));
-
-    const pctSpent = summary.total_budget_ytd > 0 
-        ? (summary.total_actual_ytd / summary.total_budget_ytd * 100).toFixed(1)
-        : 0;
-    const el = document.getElementById('bva-spent');
-    if (el) el.textContent = pctSpent + '%';
-
-    // Balance Sheet
-    const bs = dashboardData.packets?.[0]?.financial_data?.balance_sheet;
-    if (bs) {
-        setKpi('kpi-assets', bs.total_assets);
-        setKpi('kpi-liabilities', bs.total_liabilities);
-        setKpi('kpi-equity', bs.total_equity);
-        setKpi('kpi-debt', bs.long_term_debt);
-        
-        setKpi('bs-current-assets', bs.current_assets);
-        setKpi('bs-fixed-assets', bs.fixed_assets);
-        setKpi('bs-total-assets', bs.total_assets);
-        setKpi('bs-unrestricted', bs.unrestricted_funds);
-        setKpi('bs-restricted', bs.restricted_funds);
-        setKpi('bs-total-equity', bs.total_equity);
-    }
-
-    console.log('KPIs populated successfully');
+    e.textContent = `${((numerator / denominator) * 100).toFixed(decimals)}%`;
 }
 
-// Render Charts
+function el(id) {
+    return document.getElementById(id);
+}
+
 function renderCharts() {
-    try {
-        renderTrendChart();
-        renderExpenseChart();
-        renderBudgetTrendChart();
-    } catch (e) {
-        console.error('Chart error:', e);
+    if (!data.trend) return;
+    
+    const trend = data.trend;
+    const givingSeries = trend
+        .map((x, i) => ({ label: x.display_date || `P${i + 1}`, value: x.giving_ytd }))
+        .filter(x => isNum(x.value));
+    const budgetSeries = trend
+        .map((x, i) => ({ label: x.display_date || `P${i + 1}`, budget: x.budget_ytd, actual: x.actual_ytd }))
+        .filter(x => isNum(x.budget) && isNum(x.actual));
+    
+    // Trend
+    const t = el('trendChart');
+    if (t && typeof Chart !== 'undefined') {
+        if (charts.trend) charts.trend.destroy();
+        try {
+            if (givingSeries.length === 0) return;
+            charts.trend = new Chart(t, {
+                type: 'line',
+                data: {
+                    labels: givingSeries.map(x => x.label),
+                    datasets: [{
+                        label: 'Giving',
+                        data: givingSeries.map(x => x.value),
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } } }
+            });
+        } catch(e) { console.log('Chart error:', e); }
+    }
+    
+    // Expenses
+    const exp = el('expenseChart');
+    if (exp && data.top_expense_categories && typeof Chart !== 'undefined') {
+        if (charts.exp) charts.exp.destroy();
+        const exp_labels = Object.keys(data.top_expense_categories)
+            .filter(k => isNum(data.top_expense_categories[k]))
+            .slice(0, 5);
+        try {
+            if (exp_labels.length === 0) return;
+            charts.exp = new Chart(exp, {
+                type: 'bar',
+                data: {
+                    labels: exp_labels,
+                    datasets: [{ label: 'Amount', data: exp_labels.map(k => data.top_expense_categories[k]), backgroundColor: '#f59e0b' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y' }
+            });
+        } catch(e) { console.log('Chart error:', e); }
+    }
+    
+    // Budget
+    const bud = el('budgetTrendChart');
+    if (bud && typeof Chart !== 'undefined') {
+        if (charts.bud) charts.bud.destroy();
+        try {
+            if (budgetSeries.length === 0) return;
+            charts.bud = new Chart(bud, {
+                type: 'line',
+                data: {
+                    labels: budgetSeries.map(x => x.label),
+                    datasets: [
+                        { label: 'Budget', data: budgetSeries.map(x => x.budget), borderColor: '#2563eb', tension: 0.3 },
+                        { label: 'Actual', data: budgetSeries.map(x => x.actual), borderColor: '#ef4444', tension: 0.3 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        } catch(e) { console.log('Chart error:', e); }
     }
 }
 
-function renderTrendChart() {
-    const canvas = document.getElementById('trendChart');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    const trend = dashboardData.trend || [];
-    const labels = trend.map((t, i) => `Packet ${i + 1}`);
-    const data = trend.map(t => t.giving_ytd || 0);
-
-    if (charts.trendChart) charts.trendChart.destroy();
-    charts.trendChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                label: 'YTD Giving',
-                data,
-                borderColor: '#2563eb',
-                backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true } }
-        }
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const tab = btn.getAttribute('data-tab');
+        const t = el(tab);
+        if (t) t.classList.add('active');
+        btn.classList.add('active');
+        setTimeout(() => {
+            Object.values(charts).forEach(c => c?.resize?.());
+        }, 100);
     });
-}
-
-function renderExpenseChart() {
-    const canvas = document.getElementById('expenseChart');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    const expenses = dashboardData.top_expense_categories || {};
-    const labels = Object.keys(expenses).slice(0, 5);
-    const data = labels.map(k => expenses[k]);
-
-    if (charts.expenseChart) charts.expenseChart.destroy();
-    charts.expenseChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels,
-            datasets: [{
-                label: 'Amount',
-                data,
-                backgroundColor: '#f59e0b'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: 'y'
-        }
-    });
-}
-
-function renderBudgetTrendChart() {
-    const canvas = document.getElementById('budgetTrendChart');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    const trend = dashboardData.trend || [];
-    const labels = trend.map((t, i) => `Packet ${i + 1}`);
-
-    if (charts.budgetTrendChart) charts.budgetTrendChart.destroy();
-    charts.budgetTrendChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [
-                {
-                    label: 'Budget',
-                    data: trend.map(t => t.budget_ytd || 0),
-                    borderColor: '#2563eb'
-                },
-                {
-                    label: 'Actual',
-                    data: trend.map(t => t.actual_ytd || 0),
-                    borderColor: '#ef4444'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-}
-
-// Populate Tables
-function populateTables() {
-    populateRecentPackets();
-    populatePacketsTable();
-}
-
-function populateRecentPackets() {
-    const tbody = document.getElementById('recentPacketsTable')?.querySelector('tbody');
-    if (!tbody || !dashboardData.packets) return;
-
-    const packets = dashboardData.packets.slice(-5);
-    tbody.innerHTML = packets.map(p => `
-        <tr>
-            <td>${p.display_date || p.sent_date || 'N/A'}</td>
-            <td>${p.title}</td>
-            <td>${p.page_count}</td>
-            <td>${p.currency_mentions}</td>
-            <td>${p.finance_score}</td>
-        </tr>
-    `).join('');
-}
-
-function populatePacketsTable() {
-    const tbody = document.getElementById('packetsTable')?.querySelector('tbody');
-    if (!tbody || !dashboardData.packets) return;
-
-    tbody.innerHTML = dashboardData.packets.map(p => `
-        <tr>
-            <td>${p.display_date || p.sent_date || 'N/A'}</td>
-            <td>${p.title}</td>
-            <td>${p.page_count}</td>
-            <td>${p.currency_mentions}</td>
-            <td>${p.finance_score}</td>
-        </tr>
-    `).join('');
-}
-
-// Tab Events
-function attachTabEvents() {
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tabName = btn.getAttribute('data-tab');
-            switchTab(tabName);
-        });
-    });
-    console.log('Tab events attached');
-}
-
-function switchTab(tabName) {
-    // Hide all
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    // Show selected
-    const tab = document.getElementById(tabName);
-    if (tab) tab.classList.add('active');
-
-    const btn = document.querySelector(`[data-tab="${tabName}"]`);
-    if (btn) btn.classList.add('active');
-
-    // Refresh charts
-    setTimeout(() => {
-        Object.values(charts).forEach(chart => {
-            if (chart?.resize) chart.resize();
-        });
-    }, 100);
-}
-
-// Initialize
-console.log('Registering DOMContentLoaded listener');
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('✓ DOMContentLoaded fired');
-    loadDashboard();
 });
 
-console.log('✓ App.js fully loaded');
+// Start
+window.addEventListener('DOMContentLoaded', loadDashboard);
+if (document.readyState !== 'loading') loadDashboard();
